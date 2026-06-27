@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Image } from "@tarojs/components";
+import { View, Text, Image, ITouchEvent } from "@tarojs/components";
 import Taro from "@tarojs/taro";
 import "./index.scss";
 
@@ -35,14 +35,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     });
   };
 
-  const handleCheckboxClick = (e: React.MouseEvent) => {
+  const handleCheckboxClick = (e: ITouchEvent) => {
     e.stopPropagation();
     if (onToggleCompare) {
       onToggleCompare(product.id);
     }
   };
 
-  const handleDetailBtnClick = (e: React.MouseEvent) => {
+  const handleDetailBtnClick = (e: ITouchEvent) => {
     e.stopPropagation();
     handleCardClick();
   };

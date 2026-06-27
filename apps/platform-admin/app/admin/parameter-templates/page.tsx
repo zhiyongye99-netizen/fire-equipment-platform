@@ -34,9 +34,9 @@ export default function ParameterTemplatesPage() {
       key: "attrs",
       render: (_: unknown, r: Record<string, unknown>) => (
         <Space>
-          {r.is_required && <Tag color="red">必填</Tag>}
-          {r.is_filterable && <Tag color="green">可筛选</Tag>}
-          {r.is_comparable && <Tag color="orange">核心对比项</Tag>}
+          {Boolean(r.is_required) && <Tag color="red">必填</Tag>}
+          {Boolean(r.is_filterable) && <Tag color="green">可筛选</Tag>}
+          {Boolean(r.is_comparable) && <Tag color="orange">核心对比项</Tag>}
         </Space>
       ),
     },

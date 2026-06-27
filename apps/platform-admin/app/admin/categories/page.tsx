@@ -62,10 +62,10 @@ export default function CategoriesPage() {
           treeData={treeData}
           titleRender={(nodeData: Record<string, unknown>) => (
             <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "space-between", width: 400 }}>
-              <span>{nodeData.title}</span>
+              <span>{String(nodeData.title ?? "")}</span>
               <Space size="small">
-                <Button type="link" icon={<EditOutlined />} size="small" onClick={() => message.info(`编辑 ${nodeData.title}`)} />
-                <Button type="link" danger icon={<DeleteOutlined />} size="small" onClick={() => message.info(`删除 ${nodeData.title}`)} />
+                <Button type="link" icon={<EditOutlined />} size="small" onClick={() => message.info(`编辑 ${String(nodeData.title ?? "")}`)} />
+                <Button type="link" danger icon={<DeleteOutlined />} size="small" onClick={() => message.info(`删除 ${String(nodeData.title ?? "")}`)} />
               </Space>
             </div>
           )}
