@@ -83,7 +83,7 @@ export default function CompanyPage() {
         />
       )}
 
-      <Card title="🏢 企业主体基本档案" bordered={false} style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
+      <Card title="🏢 企业主体基本档案" variant="borderless" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
         <Form
           form={form}
           layout="vertical"

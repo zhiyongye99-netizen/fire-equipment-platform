@@ -171,7 +171,7 @@ export default function LeadsPage() {
         style={{ marginBottom: 20 }}
       />
 
-      <Card bordered={false} style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
+      <Card variant="borderless" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
         <Table columns={columns} dataSource={leads} rowKey="key" pagination={{ pageSize: 10 }} />
       </Card>
 

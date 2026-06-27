@@ -10,7 +10,9 @@ export interface ProductItem {
   supplierName?: string;
   coverImage?: string;
   priceRange?: string;
-  tags?: string[];
+  tags?: { text: string; color: "red" | "blue" | "green" }[];
+  scenes?: string;
+  specsLine?: string;
   parameters?: Record<string, string | number>;
 }
 
@@ -25,7 +27,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   product,
   isCompared = false,
   onToggleCompare,
-  onInquiry
+  // onInquiry prop reserved for future use
 }) => {
   const handleCardClick = () => {
     Taro.navigateTo({
@@ -33,74 +35,59 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     });
   };
 
-  const handleCompareClick = (e: any) => {
+  const handleCheckboxClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (onToggleCompare) {
       onToggleCompare(product.id);
     }
   };
 
-  const handleInquiryClick = (e: any) => {
+  const handleDetailBtnClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (onInquiry) {
-      onInquiry(product);
-    }
+    handleCardClick();
   };
 
-  // Convert key parameters object to array (max 3)
-  const paramEntries = product.parameters
-    ? Object.entries(product.parameters).slice(0, 3)
-    : [];
-
   return (
-    <View className="product-card-container" onClick={handleCardClick}>
-      <View className="image-wrapper">
+    <View className="product-card-ui" onClick={handleCardClick}>
+      <View className="thumbnail-box">
         <Image
-          className="product-image"
-          src={product.coverImage || "https://dummyimage.com/300x200/eaecf0/667085&text=消防装备"}
+          className="product-img"
+          src={product.coverImage || "https://dummyimage.com/240x180/eaecf0/667085&text=装备图片"}
           mode="aspectFill"
         />
-        {product.categoryName && (
-          <View className="category-badge">{product.categoryName}</View>
-        )}
+        <View
+          className={`checkbox-overlay ${isCompared ? "checked" : ""}`}
+          onClick={handleCheckboxClick}
+        >
+          {isCompared ? "✓" : ""}
+        </View>
       </View>
 
-      <View className="content-wrapper">
-        <Text className="product-name">{product.name}</Text>
-        
-        {product.supplierName && (
-          <Text className="supplier-name">厂商：{product.supplierName}</Text>
-        )}
+      <View className="info-box">
+        <View className="title-row">
+          <Text className="product-title">{product.name}</Text>
+          <View className="btn-view-spec" onClick={handleDetailBtnClick}>
+            看参数
+          </View>
+        </View>
 
-        {paramEntries.length > 0 && (
-          <View className="parameters-row">
-            {paramEntries.map(([key, val]) => (
-              <View key={key} className="param-pill">
-                <Text className="param-key">{key}：</Text>
-                <Text className="param-val">{val}</Text>
-              </View>
+        {product.tags && product.tags.length > 0 && (
+          <View className="tags-row">
+            {product.tags.map((t, idx) => (
+              <Text key={idx} className={`tag-badge tag-${t.color || "blue"}`}>
+                {t.text}
+              </Text>
             ))}
           </View>
         )}
 
-        <View className="footer-row">
-          <View className="price-box">
-            <Text className="price-label">参考价：</Text>
-            <Text className="price-val">{product.priceRange || "询价参考"}</Text>
-          </View>
+        <View className="meta-row">
+          <Text className="supplier-text">{product.supplierName || "中联重科"}</Text>
+          <Text className="scene-text">{product.scenes || "城市主战 / 石化园区"}</Text>
+        </View>
 
-          <View className="action-btns">
-            <View
-              className={`btn-compare ${isCompared ? "active" : ""}`}
-              onClick={handleCompareClick}
-            >
-              {isCompared ? "✓ 已加入" : "+ 对比"}
-            </View>
-
-            <View className="btn-inquiry" onClick={handleInquiryClick}>
-              在线询价
-            </View>
-          </View>
+        <View className="specs-line">
+          <Text className="specs-text">{product.specsLine || "⚙ 流量: 180L/s   ⛰ 水罐: 10t   👤 乘员: 6人"}</Text>
         </View>
       </View>
     </View>

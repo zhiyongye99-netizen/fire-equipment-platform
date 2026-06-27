@@ -98,22 +98,22 @@ export default function DashboardPage() {
       {/* 4个统计卡片 */}
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
         <Col xs={24} sm={12} lg={6}>
-          <Card bordered={false} style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
+          <Card variant="borderless" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
             <Statistic title="本月装备浏览量" value={1280} suffix="次" valueStyle={{ color: "#1677ff" }} />
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Card bordered={false} style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
+          <Card variant="borderless" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
             <Statistic title="产品收藏与比选" value={346} suffix="次" valueStyle={{ color: "#722ed1" }} />
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Card bordered={false} style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
+          <Card variant="borderless" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
             <Statistic title="意向线索总数" value={42} suffix="条" valueStyle={{ color: "#fa8c16" }} />
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Card bordered={false} style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
+          <Card variant="borderless" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
             <Statistic title="线索及时响应率" value={95.2} precision={1} suffix="%" valueStyle={{ color: "#52c41a" }} />
           </Card>
         </Col>
@@ -135,7 +135,7 @@ export default function DashboardPage() {
       </Card>
 
       {/* 最近线索 */}
-      <Card title="🔔 最新采购意向线索" bordered={false} style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
+      <Card title="🔔 最新采购意向线索" variant="borderless" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
         <Table columns={columns} dataSource={mockRecentLeads} pagination={false} size="middle" />
       </Card>
     </div>

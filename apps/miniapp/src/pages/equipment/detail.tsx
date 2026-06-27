@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, Swiper, SwiperItem, Image, ScrollView } from "@tarojs/components";
 import Taro, { useRouter } from "@tarojs/taro";
 import { InquiryModal } from "../../components/InquiryModal";
-import { getCompareIds, toggleCompareId, subscribeCompare } from "../../utils/compareStore";
+import { toggleCompareId, subscribeCompare } from "../../utils/compareStore";
 import "./detail.scss";
 
 interface DetailProduct {
@@ -51,7 +51,7 @@ export default function DetailPage() {
   const router = useRouter();
   const productId = router.params.id || "prod-101";
 
-  const [product, setProduct] = useState<DetailProduct>(MOCK_DETAIL);
+  const [product] = useState<DetailProduct>(MOCK_DETAIL);
   const [isFavorited, setIsFavorited] = useState(false);
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [isInquiryOpen, setIsInquiryOpen] = useState(false);

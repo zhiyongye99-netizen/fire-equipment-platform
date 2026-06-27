@@ -3,68 +3,110 @@ import { View, Text, Input, ScrollView, Image } from "@tarojs/components";
 import Taro from "@tarojs/taro";
 import { ProductCard, ProductItem } from "../../components/ProductCard";
 import { InquiryModal } from "../../components/InquiryModal";
-import { getCompareIds, toggleCompareId, subscribeCompare, clearCompareIds } from "../../utils/compareStore";
+import { toggleCompareId, subscribeCompare } from "../../utils/compareStore";
 import "./index.scss";
 
-// Mock categories & brands & scene data aligned with docs
-const CATEGORIES = ["全部", "消防车辆", "灭火装备", "水域救援", "防汛排涝", "无人装备", "通信指挥", "个人防护"];
-const BRANDS = ["捷达消防", "三一重工", "威海广泰", "中联重科", "晨光装备", "徐工消防"];
-const HOT_KEYWORDS = ["大流量排涝车", "举高喷射车", "水域救生艇", "消防无人机", "脉冲水枪"];
-const SCENES = [
-  { id: "scene-1", name: "高层建筑火灾", desc: "主攻高压供水与举高破拆救援", icon: "🏢" },
-  { id: "scene-2", name: "城市内涝排涝", desc: "适用于地下空间与道路强力排水", icon: "🌊" },
-  { id: "scene-3", name: "激流/水域救援", desc: "快速冲锋救生与人员转移", icon: "🚤" },
-  { id: "scene-4", name: "危化品泄漏救援", desc: "防爆洗消与远程检测管控", icon: "☣️" }
+const TOP_TABS = ["消防车辆", "器材装备", "智能装备", "维保服务"];
+
+const GRID_ACTIONS = [
+  { name: "分类筛选", icon: "🍸", type: "filter" },
+  { name: "参数对比", icon: "⚖️", type: "compare" },
+  { name: "招采参考", icon: "📋", type: "bidding" },
+  { name: "价格调研", icon: "💰", type: "price" },
+  { name: "中标案例", icon: "🏆", type: "cases" },
+  { name: "标准要求", icon: "🛡️", type: "standards" },
+  { name: "新品速览", icon: "🆕", type: "new" },
+  { name: "供应商", icon: "👥", type: "suppliers" }
+];
+
+const FILTER_GROUPS = [
+  {
+    title: "车辆类型",
+    options: ["灭火消防车", "抢险救援车", "举高消防车", "排烟排涝", "保障车辆"]
+  },
+  {
+    title: "应用场景",
+    options: ["城市主战", "高层灭火", "石化园区", "森林消防"]
+  },
+  {
+    title: "预算区间",
+    options: ["100-300万", "300-500万", "500-800万", "500万以上"]
+  },
+  {
+    title: "底盘排放",
+    options: ["国六", "国五", "新能源", "不限"]
+  }
 ];
 
 const MOCK_PRODUCTS: ProductItem[] = [
   {
     id: "prod-101",
-    name: "大流量排水抢险车 (5000m³/h)",
-    categoryName: "防汛排涝",
-    supplierName: "捷达消防装备有限公司",
-    priceRange: "¥120万 - ¥150万",
-    tags: ["城市内涝", "强力抽水", "自备动力"],
-    parameters: { "排涝流量": "5000m³/h", "最大扬程": "30m", "自吸深度": "8m" }
+    name: "18吨大流量泡沫消防车",
+    categoryName: "消防车辆",
+    supplierName: "中联重科",
+    scenes: "城市主战 / 石化园区",
+    specsLine: "⚙ 流量: 180L/s   ⛰ 水罐: 10t / 泡沫: 2t   👤 乘员: 6人",
+    tags: [
+      { text: "主战推荐", color: "red" },
+      { text: "中标参考", color: "blue" },
+      { text: "实战应用", color: "green" }
+    ],
+    coverImage: "https://dummyimage.com/240x180/eaecf0/101828&text=18吨泡沫车"
   },
   {
     id: "prod-102",
-    name: "54米举高喷射消防车",
+    name: "城市主战抢险救援消防车",
     categoryName: "消防车辆",
-    supplierName: "三一重工消防装备部",
-    priceRange: "¥380万 - ¥420万",
-    tags: ["高层灭火", "无线遥控", "大流量水炮"],
-    parameters: { "工作高度": "54m", "水炮流量": "80L/s", "乘员人数": "2+4人" }
+    supplierName: "徐工消防",
+    scenes: "城市抢险 / 山地救援",
+    specsLine: "⚙ 牵引力: 120kN   ⛰ 绞盘: 10t   👤 乘员: 6人",
+    tags: [
+      { text: "高效救援", color: "red" },
+      { text: "中标参考", color: "blue" },
+      { text: "实战应用", color: "green" }
+    ],
+    coverImage: "https://dummyimage.com/240x180/d0d5dd/101828&text=抢险救援车"
   },
   {
     id: "prod-103",
-    name: "工业级重载救援无人机",
-    categoryName: "无人装备",
-    supplierName: "晨光智能装备科技",
-    priceRange: "¥25万 - ¥35万",
-    tags: ["物资投送", "热成像探照", "抗风6级"],
-    parameters: { "最大负载": "50kg", "续航时间": "45min", "控制距离": "10km" }
+    name: "32米云梯消防车",
+    categoryName: "消防车辆",
+    supplierName: "中联重科",
+    scenes: "高层建筑 / 商业综合体",
+    specsLine: "⚙ 最大作业高度: 32m   ⛰ 额定载荷: 400kg   👤 乘员: 3人",
+    tags: [
+      { text: "高层灭火", color: "red" },
+      { text: "中标参考", color: "blue" },
+      { text: "实战应用", color: "green" }
+    ],
+    coverImage: "https://dummyimage.com/240x180/98a2b3/101828&text=32米云梯车"
   },
   {
     id: "prod-104",
-    name: "硬底铝合金激流救生冲锋艇",
-    categoryName: "水域救援",
-    supplierName: "威海广泰特种装备",
-    priceRange: "¥8.5万 - ¥12万",
-    tags: ["激流冲锋", "防撞耐磨", "9人载员"],
-    parameters: { "艇长": "4.7m", "船外机功率": "60HP", "乘载人数": "9人" }
+    name: "大流量排涝抢险车",
+    categoryName: "防汛排涝",
+    supplierName: "盈峰环境",
+    scenes: "城市内涝 / 防汛抢险",
+    specsLine: "⚙ 流量: 2000m³/h   ⛰ 扬程: 15m   👤 乘员: 2人",
+    tags: [
+      { text: "排涝抢险", color: "red" },
+      { text: "中标参考", color: "blue" },
+      { text: "实战应用", color: "green" }
+    ],
+    coverImage: "https://dummyimage.com/240x180/667085/ffffff&text=排涝车"
   }
 ];
 
 export default function EquipmentPage() {
-  const [activeCategory, setActiveCategory] = useState("全部");
-  const [activeSceneId, setActiveSceneId] = useState<string | null>(null);
+  const [activeTopTab, setActiveTopTab] = useState("消防车辆");
   const [searchKey, setSearchKey] = useState("");
+  const [selectedFilters, setSelectedFilters] = useState<Record<string, string>>({
+    "车辆类型": "灭火消防车",
+    "应用场景": "城市主战",
+    "预算区间": "300-500万",
+    "底盘排放": "国六"
+  });
   const [compareIds, setCompareIds] = useState<string[]>([]);
-  const [products, setProducts] = useState<ProductItem[]>(MOCK_PRODUCTS);
-  const [recommendPackage, setRecommendPackage] = useState<any>(null);
-
-  // Inquiry Modal state
   const [inquiryTarget, setInquiryTarget] = useState<ProductItem | null>(null);
 
   useEffect(() => {
@@ -74,25 +116,11 @@ export default function EquipmentPage() {
     return () => unsubscribe();
   }, []);
 
-  // Handle Scene recommendation switch
-  const handleSelectScene = (sceneId: string) => {
-    if (activeSceneId === sceneId) {
-      setActiveSceneId(null);
-      setRecommendPackage(null);
-      setProducts(MOCK_PRODUCTS);
-    } else {
-      setActiveSceneId(sceneId);
-      const sceneObj = SCENES.find(s => s.id === sceneId);
-      // Mock API call to POST /api/recommend
-      setRecommendPackage({
-        sceneName: sceneObj?.name,
-        matchScore: "95%",
-        requiredCapabilities: ["大流量抽排", "快速响应", "防洪自吸"],
-        reason: "根据消防救援战训需求，为您智能匹配最佳装备推荐组合方案。"
-      });
-      // Filter or sort products for recommendation
-      setProducts(MOCK_PRODUCTS);
-    }
+  const handleFilterClick = (groupTitle: string, opt: string) => {
+    setSelectedFilters(prev => ({
+      ...prev,
+      [groupTitle]: opt
+    }));
   };
 
   const handleToggleCompare = (id: string) => {
@@ -103,150 +131,136 @@ export default function EquipmentPage() {
   };
 
   const handleGoToCompare = () => {
-    if (compareIds.length === 0) return;
+    if (compareIds.length === 0) {
+      Taro.showToast({ title: "请先勾选需要对比的装备", icon: "none" });
+      return;
+    }
     Taro.navigateTo({
       url: `/pages/equipment/compare?ids=${compareIds.join(",")}`
     });
   };
 
+  const handleGridActionClick = (type: string) => {
+    if (type === "compare") {
+      handleGoToCompare();
+    } else {
+      Taro.showToast({ title: `功能准备中`, icon: "none" });
+    }
+  };
+
   return (
-    <View className="equipment-page-container">
-      {/* 顶部搜索栏 */}
-      <View className="top-search-bar">
-        <View className="search-input-box">
+    <View className="equipment-ui-page">
+      {/* 顶部标题与搜索 */}
+      <View className="header-sticky">
+        <View className="page-header-title">
+          <Text className="emblem">🛡️</Text>
+          <Text className="title-text">消防装备智选</Text>
+        </View>
+        <View className="search-bar-wrap">
           <Text className="search-icon">🔍</Text>
           <Input
             className="search-input"
-            placeholder="搜索装备名称、型号、厂商或参数..."
+            placeholder="搜泡沫消防车、空呼、破拆、无人机、招标参数"
             value={searchKey}
             onInput={e => setSearchKey(e.detail.value)}
           />
-          {searchKey && (
-            <Text className="clear-icon" onClick={() => setSearchKey("")}>✕</Text>
-          )}
+        </View>
+
+        {/* 一级大类 Tab */}
+        <View className="top-tabs-row">
+          {TOP_TABS.map(tab => (
+            <View
+              key={tab}
+              className={`top-tab-item ${activeTopTab === tab ? "active" : ""}`}
+              onClick={() => setActiveTopTab(tab)}
+            >
+              {tab}
+            </View>
+          ))}
         </View>
       </View>
 
-      {/* 分类横滑 Bar */}
-      <ScrollView className="category-scroll-bar" scrollX scrollWithAnimation>
-        <View className="category-list">
-          {CATEGORIES.map(cat => (
+      <ScrollView className="scroll-content-body" scrollY>
+        {/* 8金刚位功能入口网格 */}
+        <View className="grid-8-container">
+          {GRID_ACTIONS.map(item => (
             <View
-              key={cat}
-              className={`category-item ${activeCategory === cat ? "active" : ""}`}
-              onClick={() => {
-                setActiveCategory(cat);
-                setActiveSceneId(null);
-              }}
+              key={item.name}
+              className="grid-item"
+              onClick={() => handleGridActionClick(item.type)}
             >
-              {cat}
+              <View className="icon-circle">{item.icon}</View>
+              <Text className="item-name">{item.name}</Text>
             </View>
+          ))}
+        </View>
+
+        {/* 多维筛选条件 Block */}
+        <View className="filter-block-container">
+          {FILTER_GROUPS.map(group => (
+            <View key={group.title} className="filter-group-row">
+              <Text className="group-title">{group.title}</Text>
+              <View className="options-wrap">
+                {group.options.map(opt => (
+                  <View
+                    key={opt}
+                    className={`opt-chip ${selectedFilters[group.title] === opt ? "active" : ""}`}
+                    onClick={() => handleFilterClick(group.title, opt)}
+                  >
+                    {opt}
+                  </View>
+                ))}
+                {group.title === "应用场景" && (
+                  <Text className="more-btn">更多 ∨</Text>
+                )}
+              </View>
+            </View>
+          ))}
+        </View>
+
+        {/* 年度主战车型 Banner */}
+        <View className="operation-banner">
+          <View className="banner-text-left">
+            <Text className="banner-title">年度主战车型参考</Text>
+            <Text className="banner-sub">精选性价比车型，助力科学选型</Text>
+            <View className="btn-view-banner">立即查看 🚀</View>
+          </View>
+          <Image
+            className="banner-truck-img"
+            src="https://dummyimage.com/200x120/1677ff/ffffff&text=主战消防车"
+            mode="aspectFit"
+          />
+        </View>
+
+        {/* 产品卡片 Stream */}
+        <View className="products-list-wrap">
+          {MOCK_PRODUCTS.map(p => (
+            <ProductCard
+              key={p.id}
+              product={p}
+              isCompared={compareIds.includes(p.id)}
+              onToggleCompare={handleToggleCompare}
+              onInquiry={target => setInquiryTarget(target)}
+            />
           ))}
         </View>
       </ScrollView>
 
-      <ScrollView className="page-scroll-body" scrollY>
-        {/* 场景任务选装推荐卡片栏 (SceneSelector) */}
-        <View className="section-block scene-section">
-          <View className="section-header">
-            <Text className="section-title">⚡ 场景任务精准选装推荐</Text>
-            <Text className="section-subtitle">基于救援战训场景匹配装备方案</Text>
-          </View>
-          <ScrollView className="scene-scroll-row" scrollX scrollWithAnimation>
-            <View className="scene-list">
-              {SCENES.map(scene => (
-                <View
-                  key={scene.id}
-                  className={`scene-card ${activeSceneId === scene.id ? "active" : ""}`}
-                  onClick={() => handleSelectScene(scene.id)}
-                >
-                  <Text className="scene-icon">{scene.icon}</Text>
-                  <Text className="scene-name">{scene.name}</Text>
-                  <Text className="scene-desc">{scene.desc}</Text>
-                </View>
-              ))}
-            </View>
-          </ScrollView>
-
-          {/* 若选中场景，展示推荐套件包信息 */}
-          {recommendPackage && (
-            <View className="recommend-package-banner">
-              <View className="banner-top">
-                <Text className="package-title">🎯 【{recommendPackage.sceneName}】推荐装备方案</Text>
-                <Text className="score-tag">匹配度 {recommendPackage.matchScore}</Text>
-              </View>
-              <Text className="package-reason">{recommendPackage.reason}</Text>
-              <View className="capabilities-row">
-                <Text className="cap-label">必须能力：</Text>
-                {recommendPackage.requiredCapabilities.map((cap: string) => (
-                  <Text key={cap} className="cap-tag">{cap}</Text>
-                ))}
-              </View>
-            </View>
-          )}
+      {/* 底部浮动控制栏 */}
+      <View className="floating-action-bar">
+        <View
+          className={`compare-pill ${compareIds.length > 0 ? "active" : ""}`}
+          onClick={handleGoToCompare}
+        >
+          <Text className="scale-icon">⚖️</Text>
+          <Text className="pill-text">已加入对比 <Text className="num">{compareIds.length}</Text> ∧</Text>
         </View>
 
-        {/* 品牌 Strip 横滑 */}
-        <View className="section-block brand-section">
-          <Text className="sub-section-title">推荐厂商 / 品牌</Text>
-          <ScrollView className="brand-scroll-row" scrollX scrollWithAnimation>
-            <View className="brand-list">
-              {BRANDS.map(b => (
-                <View key={b} className="brand-chip">
-                  <Text className="brand-name">{b}</Text>
-                </View>
-              ))}
-            </View>
-          </ScrollView>
+        <View className="consult-pill" onClick={() => setInquiryTarget(MOCK_PRODUCTS[0])}>
+          <Text className="headset-icon">🎧</Text>
+          <Text className="pill-text">咨询</Text>
         </View>
-
-        {/* 热门搜索词 */}
-        <View className="section-block hot-section">
-          <View className="hot-keywords-row">
-            <Text className="hot-label">🔥 热门搜：</Text>
-            {HOT_KEYWORDS.map(kw => (
-              <Text
-                key={kw}
-                className="keyword-pill"
-                onClick={() => setSearchKey(kw)}
-              >
-                {kw}
-              </Text>
-            ))}
-          </View>
-        </View>
-
-        {/* 产品装备列表 Stream */}
-        <View className="section-block products-section">
-          <View className="section-header">
-            <Text className="section-title">装备列表 ({products.length})</Text>
-          </View>
-          <View className="product-stream">
-            {products.map(p => (
-              <ProductCard
-                key={p.id}
-                product={p}
-                isCompared={compareIds.includes(p.id)}
-                onToggleCompare={handleToggleCompare}
-                onInquiry={target => setInquiryTarget(target)}
-              />
-            ))}
-          </View>
-        </View>
-      </ScrollView>
-
-      {/* 底部悬浮对比条 CompareFloatingBar */}
-      {compareIds.length > 0 && (
-        <View className="compare-floating-bar">
-          <View className="floating-info">
-            <Text className="count-text">已选 <Text className="highlight">{compareIds.length}</Text>/4 款装备</Text>
-            <Text className="clear-btn" onClick={() => clearCompareIds()}>清空</Text>
-          </View>
-          <View className="btn-go-compare" onClick={handleGoToCompare}>
-            开始对比 →
-          </View>
-        </View>
-      )}
+      </View>
 
       {/* 询价线索弹窗 */}
       <InquiryModal

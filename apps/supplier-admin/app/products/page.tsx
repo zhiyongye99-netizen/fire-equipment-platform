@@ -149,7 +149,7 @@ export default function ProductsPage() {
         </Button>
       </div>
 
-      <Card bordered={false} style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
+      <Card variant="borderless" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
         <Table columns={columns} dataSource={products} rowKey="key" pagination={{ pageSize: 10 }} />
       </Card>
 
@@ -169,7 +169,7 @@ export default function ProductsPage() {
             提交审核
           </Button>
         ]}
-        destroyOnClose
+        destroyOnHidden
       >
         <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
           <Form.Item name="name" label="产品名称" rules={[{ required: true, message: "请输入产品名称" }]}>
