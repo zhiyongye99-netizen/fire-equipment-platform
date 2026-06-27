@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, Input, Textarea, Button } from "@tarojs/components";
 import Taro from "@tarojs/taro";
+import { api } from "../../utils/api";
 import "./index.scss";
 
 interface InquiryModalProps {
@@ -38,18 +39,14 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
 
     setLoading(true);
     try {
-      // API call to POST /api/inquiries (mocked or actual request)
-      await Taro.request({
-        url: "http://localhost:3000/api/inquiries",
-        method: "POST",
-        data: {
-          productId,
-          contactName: contactName.trim(),
-          phone: phone.trim(),
-          organization: organization.trim(),
-          remark: remark.trim()
-        }
-      }).catch(() => null);
+      await api.leads.create({
+        product_id: productId,
+        contact_name: contactName.trim(),
+        contact_phone: phone.trim(),
+        organization: organization.trim() || undefined,
+        remark: remark.trim() || undefined,
+        lead_type: "inquiry",
+      });
       Taro.showToast({ title: "询价线索已提交", icon: "success" });
       if (onSuccess) onSuccess();
       onClose();

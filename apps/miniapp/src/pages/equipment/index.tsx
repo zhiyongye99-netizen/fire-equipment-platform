@@ -4,6 +4,7 @@ import Taro from "@tarojs/taro";
 import { ProductCard, ProductItem } from "../../components/ProductCard";
 import { InquiryModal } from "../../components/InquiryModal";
 import { toggleCompareId, subscribeCompare } from "../../utils/compareStore";
+import { api, ApiProduct } from "../../utils/api";
 import "./index.scss";
 
 const TOP_TABS = ["消防车辆", "器材装备", "智能装备", "维保服务"];
@@ -107,13 +108,27 @@ export default function EquipmentPage() {
     "底盘排放": "国六"
   });
   const [compareIds, setCompareIds] = useState<string[]>([]);
-  const [inquiryTarget, setInquiryTarget] = useState<ProductItem | null>(null);
+  const [inquiryTarget, setInquiryTarget] = useState<ApiProduct | null>(null);
+  const [products, setProducts] = useState<ApiProduct[]>([]);
 
   useEffect(() => {
     const unsubscribe = subscribeCompare(ids => {
       setCompareIds([...ids]);
     });
     return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    Taro.showLoading({ title: "加载中..." });
+    api.products.list({ limit: 20 })
+      .then((res) => {
+        setProducts(res.data);
+        Taro.hideLoading();
+      })
+      .catch(() => {
+        Taro.hideLoading();
+        Taro.showToast({ title: "加载失败，请重试", icon: "none" });
+      });
   }, []);
 
   const handleFilterClick = (groupTitle: string, opt: string) => {
@@ -234,13 +249,13 @@ export default function EquipmentPage() {
 
         {/* 产品卡片 Stream */}
         <View className="products-list-wrap">
-          {MOCK_PRODUCTS.map(p => (
+          {products.map(p => (
             <ProductCard
               key={p.id}
-              product={p}
+              product={p as unknown as ProductItem}
               isCompared={compareIds.includes(p.id)}
               onToggleCompare={handleToggleCompare}
-              onInquiry={target => setInquiryTarget(target)}
+              onInquiry={target => setInquiryTarget(p)}
             />
           ))}
         </View>
@@ -256,7 +271,7 @@ export default function EquipmentPage() {
           <Text className="pill-text">已加入对比 <Text className="num">{compareIds.length}</Text> ∧</Text>
         </View>
 
-        <View className="consult-pill" onClick={() => setInquiryTarget(MOCK_PRODUCTS[0])}>
+        <View className="consult-pill" onClick={() => setInquiryTarget(products[0] ?? null)}>
           <Text className="headset-icon">🎧</Text>
           <Text className="pill-text">咨询</Text>
         </View>
