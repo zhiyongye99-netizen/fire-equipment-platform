@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Card, Typography, Row, Col, List, Table, Tag, Button, Space, Modal, Form, Input, Select, Switch, message, Divider } from "antd";
+import { Card, Typography, Row, Col, Table, Tag, Button, Space, Modal, Form, Input, Select, Switch, message, Divider } from "antd";
 import { PlusOutlined, EyeOutlined } from "@ant-design/icons";
 
 export default function ParameterTemplatesPage() {
@@ -78,22 +78,26 @@ export default function ParameterTemplatesPage() {
       <Row gutter={16}>
         <Col span={6}>
           <Card title="装备分类列表">
-            <List
-              dataSource={categories}
-              renderItem={(item) => (
-                <List.Item
+            <Space direction="vertical" style={{ width: "100%" }} size={4}>
+              {categories.map((item) => (
+                <div
+                  key={item}
                   onClick={() => setSelectedCategory(item)}
                   style={{
                     cursor: "pointer",
-                    backgroundColor: selectedCategory === item ? "#e6f7ff" : "transparent",
-                    padding: "12px 16px",
-                    borderRadius: 4,
+                    backgroundColor: selectedCategory === item ? "#e6f7ff" : "#fafafa",
+                    padding: "10px 16px",
+                    borderRadius: 6,
+                    border: selectedCategory === item ? "1px solid #91caff" : "1px solid #f0f0f0",
+                    transition: "all 0.2s",
                   }}
                 >
-                  <Typography.Text strong={selectedCategory === item}>{item}</Typography.Text>
-                </List.Item>
-              )}
-            />
+                  <Typography.Text strong={selectedCategory === item} style={{ color: selectedCategory === item ? "#1890ff" : undefined }}>
+                    {item}
+                  </Typography.Text>
+                </div>
+              ))}
+            </Space>
           </Card>
         </Col>
         <Col span={18}>
