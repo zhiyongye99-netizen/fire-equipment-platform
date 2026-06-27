@@ -1,17 +1,28 @@
-import { Injectable, CanActivate, ExecutionContext } from "@nestjs/common";
-import { Observable } from "rxjs";
+import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from "@nestjs/common";
+import * as jwt from "jsonwebtoken";
 
 /**
- * Auth Guard 骨架
- * TODO: 正式版接入微信登录，验证 JWT/session token
- * 目前直接放行，方便开发调试
+ * Auth Guard — 验证 Bearer JWT token
+ * 从 Authorization header 取 token，验证后把 payload 挂到 request.user
  */
 @Injectable()
 export class AuthGuard implements CanActivate {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  canActivate(_context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
-    // const request = context.switchToHttp().getRequest();
-    // TODO: 验证 request.headers.authorization
-    return true;
+  canActivate(context: ExecutionContext): boolean {
+    const request = context.switchToHttp().getRequest<{
+      headers: Record<string, string | undefined>;
+      user?: unknown;
+    }>();
+    const auth = request.headers["authorization"];
+    if (!auth?.startsWith("Bearer ")) throw new UnauthorizedException();
+    try {
+      const payload = jwt.verify(
+        auth.slice(7),
+        process.env.JWT_SECRET ?? "dev_secret_change_in_production",
+      );
+      request.user = payload;
+      return true;
+    } catch {
+      throw new UnauthorizedException();
+    }
   }
 }
