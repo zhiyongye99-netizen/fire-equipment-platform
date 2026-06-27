@@ -1,0 +1,14 @@
+[
+  {
+    "name": "18吨水罐消防车",
+    "category": "车辆/水罐消防车",
+    "supplier": "示例供应商",
+    "status": "approved"
+  },
+  {
+    "name": "32米举高喷射消防车",
+    "category": "车辆/举高喷射消防车",
+    "supplier": "示例供应商",
+    "status": "approved"
+  }
+]

@@ -1,0 +1,34 @@
+model = "gpt-5.5"
+model_reasoning_effort = "high"
+approval_policy = "on-request"
+default_permissions = "fire-equipment-dev"
+project_doc_fallback_filenames = ["README.md", "AGENTS.md"]
+project_doc_max_bytes = 65536
+
+[shell_environment_policy]
+include_only = ["PATH", "HOME", "NODE_ENV", "PNPM_HOME"]
+
+[permissions.fire-equipment-dev.filesystem]
+":minimal" = "read"
+
+[permissions.fire-equipment-dev.filesystem.":workspace_roots"]
+"." = "write"
+".env" = "deny"
+".env.local" = "deny"
+"**/*.env" = "deny"
+"**/*.pem" = "deny"
+"**/*.key" = "deny"
+"node_modules" = "read"
+"dist" = "deny"
+".next" = "deny"
+
+[permissions.fire-equipment-dev.network]
+enabled = true
+
+[permissions.fire-equipment-dev.network.domains]
+"registry.npmjs.org" = "allow"
+"*.npmjs.org" = "allow"
+"github.com" = "allow"
+"*.github.com" = "allow"
+"localhost" = "allow"
+"127.0.0.1" = "allow"

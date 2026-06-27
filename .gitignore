@@ -1,0 +1,19 @@
+node_modules/
+dist/
+.next/
+.env
+.env.local
+*.pem
+*.key
+.DS_Store
+
+# Sensitive files
+.env
+.env.local
+*.pem
+*.key
+database_backup/
+private-materials/
+node_modules/
+dist/
+.next/

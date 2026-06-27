@@ -1,0 +1,21 @@
+请根据数据库模型实现后端 API 基础。
+
+范围：
+1. GET /categories
+2. GET /products
+3. GET /products/:id
+4. GET /suppliers
+5. GET /bid-cases
+6. POST /leads  发起询价/索资料线索
+7. GET /compare/products?ids=1,2,3
+8. POST /recommend  根据场景和条件返回推荐装备
+
+要求：
+- 使用 NestJS；
+- 有 DTO；
+- 有基础参数校验；
+- 返回结构稳定；
+- 暂时可以使用 seed 数据；
+- 不做复杂权限，但要预留 auth guard 结构。
+
+完成后运行 lint/typecheck/test，并输出接口调用示例。

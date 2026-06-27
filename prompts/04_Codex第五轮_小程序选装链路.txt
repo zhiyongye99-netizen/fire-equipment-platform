@@ -1,0 +1,28 @@
+请实现微信小程序选装核心链路。
+
+参考：
+- docs/31_可开发级UI结构图_四大页面.md
+- docs/30_选装推荐引擎完整逻辑.md
+- docs/08_UI设计规则.md
+- design-references/02_equipment_home_v3_low_density.png
+- design-references/06_product_detail_low_density.png
+- design-references/07_parameter_compare.png
+
+范围：
+1. 选装首页；
+2. 分类筛选；
+3. 产品列表；
+4. 产品详情；
+5. 加入对比；
+6. 参数对比；
+7. 发起询价/索资料。
+
+要求：
+- 手机端低密度；
+- 不遮挡微信胶囊；
+- 字号和按钮符合 docs/08_UI设计规则.md；
+- UI 图只作为布局参考，字段以 API 和数据库为准；
+- 不实现支付；
+- 不实现正式招标文件生成。
+
+完成后说明如何在微信开发者工具验收。

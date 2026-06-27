@@ -1,0 +1,28 @@
+{
+  "name": "fire-equipment-platform",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.7.0",
+  "scripts": {
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "dev:miniapp": "pnpm --filter @fire-equipment/miniapp dev:weapp",
+    "build:miniapp": "pnpm --filter @fire-equipment/miniapp build:weapp",
+    "dev:supplier-admin": "pnpm --filter @fire-equipment/supplier-admin dev",
+    "dev:platform-admin": "pnpm --filter @fire-equipment/platform-admin dev",
+    "dev:api": "pnpm --filter @fire-equipment/api start:dev",
+    "prisma:generate": "pnpm --filter @fire-equipment/api prisma:generate"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.0.1",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^10.0.1",
+    "prettier": "^3.9.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.62.0",
+    "vitest": "^4.1.9"
+  }
+}

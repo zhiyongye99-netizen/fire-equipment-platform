@@ -1,0 +1,34 @@
+[
+  {
+    "category": "水罐消防车",
+    "field": "水罐容量",
+    "unit": "t",
+    "required": true,
+    "level": "★",
+    "compare": true
+  },
+  {
+    "category": "水罐消防车",
+    "field": "消防泵流量",
+    "unit": "L/s",
+    "required": true,
+    "level": "▲",
+    "compare": true
+  },
+  {
+    "category": "举高喷射消防车",
+    "field": "最大作业高度",
+    "unit": "m",
+    "required": true,
+    "level": "★",
+    "compare": true
+  },
+  {
+    "category": "空气呼吸器",
+    "field": "气瓶容量",
+    "unit": "L",
+    "required": true,
+    "level": "★",
+    "compare": true
+  }
+]

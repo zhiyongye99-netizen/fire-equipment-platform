@@ -1,0 +1,7 @@
+node_modules
+dist
+.next
+coverage
+docs/04_装备数据模板包.xlsx
+design-references
+source-materials
