@@ -1,0 +1,20 @@
+[
+  {
+    "id": "scene_high_rise_fire",
+    "name": "高层建筑火灾",
+    "category": "火灾类",
+    "required_capabilities": ["高压供水", "举高救援", "高空破拆"]
+  },
+  {
+    "id": "scene_urban_flood",
+    "name": "城市内涝",
+    "category": "水域/排涝类",
+    "required_capabilities": ["大流量排水", "快速部署", "复杂地形通行"]
+  },
+  {
+    "id": "scene_water_rescue",
+    "name": "水域救援",
+    "category": "水域类",
+    "required_capabilities": ["快速投送", "抗流速", "人员救援"]
+  }
+]

@@ -1,0 +1,24 @@
+import { Controller, Get, Param, Query } from "@nestjs/common";
+import { ProductsService } from "./products.service";
+import { QueryProductsDto } from "./dto/query-products.dto";
+
+@Controller("products")
+export class ProductsController {
+  constructor(private readonly productsService: ProductsService) {}
+
+  @Get()
+  findAll(@Query() query: QueryProductsDto) {
+    return this.productsService.findAll(query);
+  }
+
+  @Get("compare")
+  compare(@Query("ids") ids: string) {
+    const idList = ids ? ids.split(",").filter(Boolean) : [];
+    return this.productsService.compare(idList);
+  }
+
+  @Get(":id")
+  findOne(@Param("id") id: string) {
+    return this.productsService.findOne(id);
+  }
+}

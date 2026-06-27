@@ -1,0 +1,28 @@
+请根据 AGENTS.md 和 docs/ 创建项目基础骨架。
+
+只创建以下内容：
+1. monorepo 项目结构；
+2. Taro + React + TypeScript 微信小程序端；
+3. Next.js + React + TypeScript + Ant Design 供应商后台；
+4. Next.js + React + TypeScript + Ant Design 平台运营后台；
+5. NestJS + TypeScript 后端 API；
+6. Prisma + PostgreSQL 数据库配置；
+7. ESLint、Prettier、TypeScript、pnpm workspace 配置；
+8. 基础路由和空页面。
+
+不要实现业务功能。
+不要写死 mock 数据到业务代码。
+不要修改 AGENTS.md 和 docs/。
+
+完成后运行：
+pnpm lint
+pnpm typecheck
+pnpm test
+
+最后输出：
+1. 创建了哪些文件；
+2. 当前项目如何启动；
+3. 小程序编译输出目录在哪里；
+4. 如何用微信开发者工具导入；
+5. 哪些检查通过；
+6. 哪些地方需要人工确认。

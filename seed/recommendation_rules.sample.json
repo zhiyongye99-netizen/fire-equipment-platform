@@ -1,0 +1,24 @@
+[
+  {
+    "scene_id": "scene_high_rise_fire",
+    "preferred_equipment": ["云梯消防车", "举高喷射消防车", "高压水罐车"],
+    "weights": {
+      "scene_match": 0.4,
+      "parameter_match": 0.25,
+      "bid_frequency": 0.2,
+      "supplier_reliability": 0.1,
+      "platform_heat": 0.05
+    }
+  },
+  {
+    "scene_id": "scene_urban_flood",
+    "preferred_equipment": ["大流量排水抢险车", "排水机器人", "移动泵站", "应急照明车"],
+    "weights": {
+      "scene_match": 0.4,
+      "parameter_match": 0.25,
+      "bid_frequency": 0.2,
+      "supplier_reliability": 0.1,
+      "platform_heat": 0.05
+    }
+  }
+]
