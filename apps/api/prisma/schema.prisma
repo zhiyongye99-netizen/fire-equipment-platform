@@ -1,0 +1,366 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ReviewStatus {
+  draft
+  pending
+  approved
+  rejected
+  archived
+}
+
+enum InquiryType {
+  price_inquiry
+  request_material
+  request_demo
+}
+
+enum InquiryStatus {
+  pending
+  followed
+  closed
+}
+
+enum PrivacyLevel {
+  public
+  protected
+  private
+}
+
+enum UserRole {
+  firefighter
+  procurement
+  supplier_user
+  admin
+}
+
+model User {
+  id              String         @id @default(cuid())
+  openid          String         @unique
+  unionid         String?        @unique
+  nickname        String?
+  avatar_url      String?
+  phone           String?
+  role            UserRole       @default(firefighter)
+  organization_id String?
+  organization    Organization?  @relation(fields: [organization_id], references: [id])
+  supplier_users  SupplierUser[]
+  favorites       Favorite[]
+  comparisons     Comparison[]
+  inquiries       Inquiry[]
+  posts           Post[]
+  comments        Comment[]
+  messages        Message[]
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @updatedAt
+
+  @@map("users")
+}
+
+model Organization {
+  id         String   @id @default(cuid())
+  name       String
+  province   String?
+  city       String?
+  type       String?
+  users      User[]
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("organizations")
+}
+
+model Supplier {
+  id                   String         @id @default(cuid())
+  name                 String
+  short_name           String?
+  logo_url             String?
+  unified_code         String?        @unique
+  business_license_url String?
+  province             String?
+  city                 String?
+  address              String?
+  contact_name         String?
+  contact_phone        String?
+  contact_email        String?
+  intro                String?        @db.Text
+  review_status        ReviewStatus   @default(draft)
+  verified_at          DateTime?
+  supplier_users       SupplierUser[]
+  products             Product[]
+  inquiries            Inquiry[]
+  review_records       ReviewRecord[]
+  created_at           DateTime       @default(now())
+  updated_at           DateTime       @updatedAt
+
+  @@map("suppliers")
+}
+
+model SupplierUser {
+  id          String   @id @default(cuid())
+  user_id     String
+  supplier_id String
+  job_title   String?
+  is_admin    Boolean  @default(false)
+  user        User     @relation(fields: [user_id], references: [id])
+  supplier    Supplier @relation(fields: [supplier_id], references: [id])
+  created_at  DateTime @default(now())
+
+  @@unique([user_id, supplier_id])
+  @@map("supplier_users")
+}
+
+model EquipmentCategory {
+  id         String              @id @default(cuid())
+  name       String
+  slug       String              @unique
+  icon_url   String?
+  parent_id  String?
+  parent     EquipmentCategory?  @relation("CategoryTree", fields: [parent_id], references: [id])
+  children   EquipmentCategory[] @relation("CategoryTree")
+  sort_order Int                 @default(0)
+  products   Product[]
+  templates  ParameterTemplate[]
+  created_at DateTime            @default(now())
+  updated_at DateTime            @updatedAt
+
+  @@map("equipment_categories")
+}
+
+model ParameterTemplate {
+  id                 String             @id @default(cuid())
+  category_id        String
+  field_key          String
+  field_label        String
+  field_type         String
+  unit               String?
+  options            Json?
+  sort_order         Int                @default(0)
+  is_required        Boolean            @default(false)
+  is_filterable      Boolean            @default(false)
+  is_comparable      Boolean            @default(true)
+  category           EquipmentCategory  @relation(fields: [category_id], references: [id])
+  product_parameters ProductParameter[]
+  created_at         DateTime           @default(now())
+  updated_at         DateTime           @updatedAt
+
+  @@unique([category_id, field_key])
+  @@map("parameter_templates")
+}
+
+model Product {
+  id              String             @id @default(cuid())
+  supplier_id     String
+  category_id     String
+  name            String
+  model_no        String?
+  brand           String?
+  cover_image_url String?
+  images          Json?
+  price_min       Decimal?           @db.Decimal(12, 2)
+  price_max       Decimal?           @db.Decimal(12, 2)
+  price_note      String?
+  description     String?            @db.Text
+  review_status   ReviewStatus       @default(draft)
+  is_featured     Boolean            @default(false)
+  view_count      Int                @default(0)
+  inquiry_count   Int                @default(0)
+  supplier        Supplier           @relation(fields: [supplier_id], references: [id])
+  category        EquipmentCategory  @relation(fields: [category_id], references: [id])
+  parameters      ProductParameter[]
+  materials       ProductMaterial[]
+  favorites       Favorite[]
+  comparisons     Comparison[]
+  inquiries       Inquiry[]
+  review_records  ReviewRecord[]
+  created_at      DateTime           @default(now())
+  updated_at      DateTime           @updatedAt
+
+  @@map("products")
+}
+
+model ProductParameter {
+  id          String            @id @default(cuid())
+  product_id  String
+  template_id String
+  value       String
+  product     Product           @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  template    ParameterTemplate @relation(fields: [template_id], references: [id])
+  created_at  DateTime          @default(now())
+  updated_at  DateTime          @updatedAt
+
+  @@unique([product_id, template_id])
+  @@map("product_parameters")
+}
+
+model ProductMaterial {
+  id            String       @id @default(cuid())
+  product_id    String
+  name          String
+  file_url      String
+  file_type     String?
+  file_size     Int?
+  review_status ReviewStatus @default(draft)
+  product       Product      @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  created_at    DateTime     @default(now())
+
+  @@map("product_materials")
+}
+
+model Article {
+  id            String       @id @default(cuid())
+  title         String
+  cover_url     String?
+  content       String       @db.Text
+  summary       String?      @db.Text
+  source        String?
+  channel       String?
+  review_status ReviewStatus @default(draft)
+  is_featured   Boolean      @default(false)
+  view_count    Int          @default(0)
+  published_at  DateTime?
+  created_at    DateTime     @default(now())
+  updated_at    DateTime     @updatedAt
+
+  @@map("articles")
+}
+
+model Circle {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?  @db.Text
+  icon_url    String?
+  sort_order  Int      @default(0)
+  posts       Post[]
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@map("circles")
+}
+
+model Post {
+  id            String       @id @default(cuid())
+  user_id       String
+  circle_id     String?
+  title         String?
+  content       String       @db.Text
+  images        Json?
+  review_status ReviewStatus @default(draft)
+  like_count    Int          @default(0)
+  view_count    Int          @default(0)
+  user          User         @relation(fields: [user_id], references: [id])
+  circle        Circle?      @relation(fields: [circle_id], references: [id])
+  comments      Comment[]
+  created_at    DateTime     @default(now())
+  updated_at    DateTime     @updatedAt
+
+  @@map("posts")
+}
+
+model Comment {
+  id         String    @id @default(cuid())
+  user_id    String
+  post_id    String
+  parent_id  String?
+  content    String    @db.Text
+  like_count Int       @default(0)
+  user       User      @relation(fields: [user_id], references: [id])
+  post       Post      @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  parent     Comment?  @relation("CommentThread", fields: [parent_id], references: [id])
+  replies    Comment[] @relation("CommentThread")
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+
+  @@map("comments")
+}
+
+model Favorite {
+  id         String   @id @default(cuid())
+  user_id    String
+  product_id String
+  user       User     @relation(fields: [user_id], references: [id])
+  product    Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  created_at DateTime @default(now())
+
+  @@unique([user_id, product_id])
+  @@map("favorites")
+}
+
+model Comparison {
+  id         String   @id @default(cuid())
+  user_id    String
+  product_id String
+  session_id String?
+  user       User     @relation(fields: [user_id], references: [id])
+  product    Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  created_at DateTime @default(now())
+
+  @@map("comparisons")
+}
+
+model Inquiry {
+  id            String        @id @default(cuid())
+  user_id       String
+  supplier_id   String
+  product_id    String?
+  inquiry_type  InquiryType
+  region        String?
+  demand_text   String?       @db.Text
+  status        InquiryStatus @default(pending)
+  privacy_level PrivacyLevel  @default(protected)
+  user          User          @relation(fields: [user_id], references: [id])
+  supplier      Supplier      @relation(fields: [supplier_id], references: [id])
+  product       Product?      @relation(fields: [product_id], references: [id])
+  created_at    DateTime      @default(now())
+  updated_at    DateTime      @updatedAt
+
+  @@map("inquiries")
+}
+
+model ReviewRecord {
+  id          String       @id @default(cuid())
+  target_type String // supplier | product | post | article
+  target_id   String
+  status      ReviewStatus
+  reason      String?      @db.Text
+  reviewer_id String?
+  supplier    Supplier?    @relation(fields: [target_id], references: [id], map: "review_supplier_fk")
+  product     Product?     @relation(fields: [target_id], references: [id], map: "review_product_fk")
+  created_at  DateTime     @default(now())
+
+  @@map("review_records")
+}
+
+model OperationLog {
+  id          String   @id @default(cuid())
+  operator_id String?
+  action      String
+  target_type String?
+  target_id   String?
+  detail      Json?
+  ip          String?
+  created_at  DateTime @default(now())
+
+  @@map("operation_logs")
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  user_id    String
+  type       String
+  title      String?
+  content    String   @db.Text
+  is_read    Boolean  @default(false)
+  ref_type   String?
+  ref_id     String?
+  user       User     @relation(fields: [user_id], references: [id])
+  created_at DateTime @default(now())
+
+  @@map("messages")
+}
