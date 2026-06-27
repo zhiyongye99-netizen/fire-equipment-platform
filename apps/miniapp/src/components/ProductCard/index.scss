@@ -1,0 +1,138 @@
+.product-card-container {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  margin-bottom: 24rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 8rpx rgba(16, 24, 40, 0.04);
+  border: 1px solid #f2f4f7;
+  display: flex;
+  flex-direction: column;
+
+  .image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 320rpx;
+    background-color: #f8fafc;
+
+    .product-image {
+      width: 100%;
+      height: 100%;
+    }
+
+    .category-badge {
+      position: absolute;
+      top: 16rpx;
+      left: 16rpx;
+      background-color: rgba(15, 23, 42, 0.75);
+      color: #ffffff;
+      font-size: 22rpx;
+      padding: 4rpx 12rpx;
+      border-radius: 8rpx;
+      backdrop-filter: blur(4px);
+    }
+  }
+
+  .content-wrapper {
+    padding: 24rpx;
+
+    .product-name {
+      font-size: 32rpx;
+      font-weight: 600;
+      color: #101828;
+      line-height: 1.4;
+      margin-bottom: 8rpx;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+    }
+
+    .supplier-name {
+      font-size: 24rpx;
+      color: #667085;
+      margin-bottom: 16rpx;
+      display: block;
+    }
+
+    .parameters-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12rpx;
+      margin-bottom: 20rpx;
+
+      .param-pill {
+        background-color: #f8fafc;
+        border: 1px solid #eaecf0;
+        border-radius: 8rpx;
+        padding: 6rpx 14rpx;
+        font-size: 24rpx;
+        display: flex;
+        align-items: center;
+
+        .param-key {
+          color: #667085;
+        }
+
+        .param-val {
+          color: #1d2939;
+          font-weight: 500;
+        }
+      }
+    }
+
+    .footer-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 16rpx;
+      border-top: 1px dashed #f2f4f7;
+
+      .price-box {
+        display: flex;
+        align-items: baseline;
+
+        .price-label {
+          font-size: 24rpx;
+          color: #667085;
+        }
+
+        .price-val {
+          font-size: 30rpx;
+          font-weight: 700;
+          color: #d92d20;
+        }
+      }
+
+      .action-btns {
+        display: flex;
+        gap: 12rpx;
+
+        .btn-compare {
+          padding: 12rpx 20rpx;
+          border-radius: 10rpx;
+          font-size: 26rpx;
+          font-weight: 500;
+          border: 1px solid #d0d5dd;
+          color: #344054;
+          background-color: #ffffff;
+          transition: all 0.2s;
+
+          &.active {
+            background-color: #eff8ff;
+            border-color: #84caff;
+            color: #175cd3;
+          }
+        }
+
+        .btn-inquiry {
+          padding: 12rpx 24rpx;
+          border-radius: 10rpx;
+          font-size: 26rpx;
+          font-weight: 600;
+          background-color: #d92d20;
+          color: #ffffff;
+        }
+      }
+    }
+  }
+}

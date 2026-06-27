@@ -1,0 +1,305 @@
+.equipment-page-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f8fafc;
+  box-sizing: border-box;
+
+  .top-search-bar {
+    background-color: #ffffff;
+    padding: 20rpx 32rpx;
+    border-bottom: 1px solid #f2f4f7;
+
+    .search-input-box {
+      display: flex;
+      align-items: center;
+      background-color: #f2f4f7;
+      border-radius: 40rpx;
+      padding: 0 24rpx;
+      height: 72rpx;
+
+      .search-icon {
+        font-size: 28rpx;
+        margin-right: 16rpx;
+      }
+
+      .search-input {
+        flex: 1;
+        font-size: 28rpx;
+        color: #101828;
+      }
+
+      .clear-icon {
+        font-size: 28rpx;
+        color: #98a2b3;
+        padding: 8rpx;
+      }
+    }
+  }
+
+  .category-scroll-bar {
+    background-color: #ffffff;
+    border-bottom: 1px solid #eaecf0;
+    white-space: nowrap;
+
+    .category-list {
+      display: flex;
+      padding: 16rpx 24rpx;
+      gap: 16rpx;
+
+      .category-item {
+        display: inline-block;
+        padding: 12rpx 28rpx;
+        border-radius: 32rpx;
+        font-size: 28rpx;
+        color: #475467;
+        background-color: #f8fafc;
+        font-weight: 500;
+        transition: all 0.2s;
+
+        &.active {
+          background-color: #d92d20;
+          color: #ffffff;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+
+  .page-scroll-body {
+    flex: 1;
+    padding: 24rpx 32rpx;
+    box-sizing: border-box;
+
+    .section-block {
+      margin-bottom: 32rpx;
+
+      .section-header {
+        margin-bottom: 20rpx;
+
+        .section-title {
+          font-size: 32rpx;
+          font-weight: 700;
+          color: #101828;
+          display: block;
+        }
+
+        .section-subtitle {
+          font-size: 24rpx;
+          color: #667085;
+          margin-top: 4rpx;
+          display: block;
+        }
+      }
+    }
+
+    .scene-section {
+      .scene-scroll-row {
+        white-space: nowrap;
+
+        .scene-list {
+          display: flex;
+          gap: 20rpx;
+
+          .scene-card {
+            display: inline-flex;
+            flex-direction: column;
+            width: 240rpx;
+            padding: 20rpx;
+            border-radius: 16rpx;
+            background-color: #ffffff;
+            border: 2rpx solid #eaecf0;
+            box-sizing: border-box;
+
+            &.active {
+              border-color: #d92d20;
+              background-color: #fffbfa;
+            }
+
+            .scene-icon {
+              font-size: 40rpx;
+              margin-bottom: 12rpx;
+            }
+
+            .scene-name {
+              font-size: 28rpx;
+              font-weight: 600;
+              color: #101828;
+              margin-bottom: 8rpx;
+            }
+
+            .scene-desc {
+              font-size: 22rpx;
+              color: #667085;
+              white-space: normal;
+              line-height: 1.3;
+            }
+          }
+        }
+      }
+
+      .recommend-package-banner {
+        margin-top: 24rpx;
+        background-color: #101828;
+        color: #ffffff;
+        padding: 24rpx;
+        border-radius: 16rpx;
+
+        .banner-top {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 12rpx;
+
+          .package-title {
+            font-size: 28rpx;
+            font-weight: 600;
+            color: #ffffff;
+          }
+
+          .score-tag {
+            background-color: #d92d20;
+            color: #ffffff;
+            font-size: 22rpx;
+            padding: 4rpx 12rpx;
+            border-radius: 20rpx;
+            font-weight: 700;
+          }
+        }
+
+        .package-reason {
+          font-size: 24rpx;
+          color: #eaecf0;
+          line-height: 1.4;
+          margin-bottom: 16rpx;
+          display: block;
+        }
+
+        .capabilities-row {
+          display: flex;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 12rpx;
+
+          .cap-label {
+            font-size: 24rpx;
+            color: #98a2b3;
+          }
+
+          .cap-tag {
+            background-color: rgba(255, 255, 255, 0.15);
+            font-size: 22rpx;
+            padding: 4rpx 12rpx;
+            border-radius: 8rpx;
+          }
+        }
+      }
+    }
+
+    .brand-section {
+      .sub-section-title {
+        font-size: 26rpx;
+        font-weight: 600;
+        color: #475467;
+        margin-bottom: 16rpx;
+        display: block;
+      }
+
+      .brand-scroll-row {
+        white-space: nowrap;
+
+        .brand-list {
+          display: flex;
+          gap: 16rpx;
+
+          .brand-chip {
+            display: inline-block;
+            background-color: #ffffff;
+            border: 1px solid #eaecf0;
+            padding: 12rpx 24rpx;
+            border-radius: 12rpx;
+
+            .brand-name {
+              font-size: 26rpx;
+              color: #344054;
+              font-weight: 500;
+            }
+          }
+        }
+      }
+    }
+
+    .hot-section {
+      .hot-keywords-row {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12rpx;
+
+        .hot-label {
+          font-size: 24rpx;
+          color: #667085;
+          font-weight: 600;
+        }
+
+        .keyword-pill {
+          font-size: 24rpx;
+          color: #344054;
+          background-color: #f2f4f7;
+          padding: 6rpx 16rpx;
+          border-radius: 20rpx;
+        }
+      }
+    }
+
+    .products-section {
+      padding-bottom: 120rpx;
+    }
+  }
+
+  .compare-floating-bar {
+    position: fixed;
+    bottom: 32rpx;
+    left: 32rpx;
+    right: 32rpx;
+    background-color: #101828;
+    border-radius: 40rpx;
+    padding: 20rpx 32rpx;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 8rpx 24rpx rgba(16, 24, 40, 0.2);
+    z-index: 900;
+
+    .floating-info {
+      display: flex;
+      align-items: center;
+
+      .count-text {
+        font-size: 28rpx;
+        color: #ffffff;
+
+        .highlight {
+          color: #f04438;
+          font-weight: 700;
+        }
+      }
+
+      .clear-btn {
+        font-size: 24rpx;
+        color: #98a2b3;
+        margin-left: 20rpx;
+        text-decoration: underline;
+      }
+    }
+
+    .btn-go-compare {
+      background-color: #d92d20;
+      color: #ffffff;
+      font-size: 28rpx;
+      font-weight: 600;
+      padding: 12rpx 28rpx;
+      border-radius: 30rpx;
+    }
+  }
+}
