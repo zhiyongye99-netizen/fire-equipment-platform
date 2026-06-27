@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Card, Typography, Row, Col, Table, Tag, Button, Space, Modal, Form, Input, Select, Switch, message, Divider } from "antd";
+import { Card, Typography, Row, Col, Table, Tag, Button, Space, Modal, Form, Input, Select, Switch, message, Divider, Flex } from "antd";
 import { PlusOutlined, EyeOutlined } from "@ant-design/icons";
 
 export default function ParameterTemplatesPage() {
@@ -78,7 +78,7 @@ export default function ParameterTemplatesPage() {
       <Row gutter={16}>
         <Col span={6}>
           <Card title="装备分类列表">
-            <Space direction="vertical" style={{ width: "100%" }} size={4}>
+            <Flex vertical style={{ width: "100%" }} gap={4}>
               {categories.map((item) => (
                 <div
                   key={item}
@@ -97,7 +97,7 @@ export default function ParameterTemplatesPage() {
                   </Typography.Text>
                 </div>
               ))}
-            </Space>
+            </Flex>
           </Card>
         </Col>
         <Col span={18}>
