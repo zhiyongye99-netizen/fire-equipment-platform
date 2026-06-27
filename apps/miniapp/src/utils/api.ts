@@ -1,4 +1,5 @@
 import Taro from "@tarojs/taro";
+import { getToken } from "./auth";
 
 const BASE_URL = "http://localhost:3000/api";
 
@@ -6,11 +7,15 @@ async function request<T>(
   path: string,
   options?: { method?: "GET" | "POST"; data?: Record<string, unknown> }
 ): Promise<T> {
+  const token = getToken();
   const res = await Taro.request({
     url: `${BASE_URL}${path}`,
     method: options?.method ?? "GET",
     data: options?.data,
-    header: { "Content-Type": "application/json" },
+    header: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
   });
   if (res.statusCode >= 400) {
     throw new Error(`API error ${res.statusCode}: ${path}`);
@@ -63,6 +68,13 @@ export interface ApiListResponse<T> {
 }
 
 export const api = {
+  auth: {
+    wechat: (body: { code: string; nickname?: string; avatarUrl?: string }) =>
+      request<{ data: { token: string; user: { id: string; openid: string; role: string; nickname: string | null } } }>("/auth/wechat", {
+        method: "POST",
+        data: body as Record<string, unknown>,
+      }),
+  },
   products: {
     list: (params?: { category_id?: string; page?: number; limit?: number }) => {
       const qs = new URLSearchParams();
