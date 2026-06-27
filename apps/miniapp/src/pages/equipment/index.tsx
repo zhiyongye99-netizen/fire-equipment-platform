@@ -39,64 +39,6 @@ const FILTER_GROUPS = [
   }
 ];
 
-const MOCK_PRODUCTS: ProductItem[] = [
-  {
-    id: "prod-101",
-    name: "18吨大流量泡沫消防车",
-    categoryName: "消防车辆",
-    supplierName: "中联重科",
-    scenes: "城市主战 / 石化园区",
-    specsLine: "⚙ 流量: 180L/s   ⛰ 水罐: 10t / 泡沫: 2t   👤 乘员: 6人",
-    tags: [
-      { text: "主战推荐", color: "red" },
-      { text: "中标参考", color: "blue" },
-      { text: "实战应用", color: "green" }
-    ],
-    coverImage: "https://dummyimage.com/240x180/eaecf0/101828&text=18吨泡沫车"
-  },
-  {
-    id: "prod-102",
-    name: "城市主战抢险救援消防车",
-    categoryName: "消防车辆",
-    supplierName: "徐工消防",
-    scenes: "城市抢险 / 山地救援",
-    specsLine: "⚙ 牵引力: 120kN   ⛰ 绞盘: 10t   👤 乘员: 6人",
-    tags: [
-      { text: "高效救援", color: "red" },
-      { text: "中标参考", color: "blue" },
-      { text: "实战应用", color: "green" }
-    ],
-    coverImage: "https://dummyimage.com/240x180/d0d5dd/101828&text=抢险救援车"
-  },
-  {
-    id: "prod-103",
-    name: "32米云梯消防车",
-    categoryName: "消防车辆",
-    supplierName: "中联重科",
-    scenes: "高层建筑 / 商业综合体",
-    specsLine: "⚙ 最大作业高度: 32m   ⛰ 额定载荷: 400kg   👤 乘员: 3人",
-    tags: [
-      { text: "高层灭火", color: "red" },
-      { text: "中标参考", color: "blue" },
-      { text: "实战应用", color: "green" }
-    ],
-    coverImage: "https://dummyimage.com/240x180/98a2b3/101828&text=32米云梯车"
-  },
-  {
-    id: "prod-104",
-    name: "大流量排涝抢险车",
-    categoryName: "防汛排涝",
-    supplierName: "盈峰环境",
-    scenes: "城市内涝 / 防汛抢险",
-    specsLine: "⚙ 流量: 2000m³/h   ⛰ 扬程: 15m   👤 乘员: 2人",
-    tags: [
-      { text: "排涝抢险", color: "red" },
-      { text: "中标参考", color: "blue" },
-      { text: "实战应用", color: "green" }
-    ],
-    coverImage: "https://dummyimage.com/240x180/667085/ffffff&text=排涝车"
-  }
-];
 
 export default function EquipmentPage() {
   const [activeTopTab, setActiveTopTab] = useState("消防车辆");
@@ -255,7 +197,7 @@ export default function EquipmentPage() {
               product={p as unknown as ProductItem}
               isCompared={compareIds.includes(p.id)}
               onToggleCompare={handleToggleCompare}
-              onInquiry={target => setInquiryTarget(p)}
+              onInquiry={() => setInquiryTarget(p)}
             />
           ))}
         </View>
