@@ -154,7 +154,7 @@ model ParameterTemplate {
 }
 
 model Product {
-  id              String             @id @default(cuid())
+  id              String              @id @default(cuid())
   supplier_id     String
   category_id     String
   name            String
@@ -162,24 +162,25 @@ model Product {
   brand           String?
   cover_image_url String?
   images          Json?
-  price_min       Decimal?           @db.Decimal(12, 2)
-  price_max       Decimal?           @db.Decimal(12, 2)
+  price_min       Decimal?            @db.Decimal(12, 2)
+  price_max       Decimal?            @db.Decimal(12, 2)
   price_note      String?
-  description     String?            @db.Text
-  review_status   ReviewStatus       @default(draft)
-  is_featured     Boolean            @default(false)
-  view_count      Int                @default(0)
-  inquiry_count   Int                @default(0)
-  supplier        Supplier           @relation(fields: [supplier_id], references: [id])
-  category        EquipmentCategory  @relation(fields: [category_id], references: [id])
+  description     String?             @db.Text
+  review_status   ReviewStatus        @default(draft)
+  is_featured     Boolean             @default(false)
+  view_count      Int                 @default(0)
+  inquiry_count   Int                 @default(0)
+  supplier        Supplier            @relation(fields: [supplier_id], references: [id])
+  category        EquipmentCategory   @relation(fields: [category_id], references: [id])
   parameters      ProductParameter[]
   materials       ProductMaterial[]
   favorites       Favorite[]
   comparisons     Comparison[]
   inquiries       Inquiry[]
   review_records  ReviewRecord[]
-  created_at      DateTime           @default(now())
-  updated_at      DateTime           @updatedAt
+  capabilities    ProductCapability[]
+  created_at      DateTime            @default(now())
+  updated_at      DateTime            @updatedAt
 
   @@map("products")
 }
@@ -363,4 +364,58 @@ model Message {
   created_at DateTime @default(now())
 
   @@map("messages")
+}
+
+// --- 选装推荐引擎 ---
+
+model Scene {
+  id                    String               @id @default(cuid())
+  name                  String
+  slug                  String               @unique
+  category              String
+  required_capabilities String[]
+  rules                 RecommendationRule[]
+  created_at            DateTime             @default(now())
+  updated_at            DateTime             @updatedAt
+
+  @@map("scenes")
+}
+
+model Capability {
+  id                   String              @id @default(cuid())
+  name                 String              @unique
+  description          String?
+  product_capabilities ProductCapability[]
+  created_at           DateTime            @default(now())
+
+  @@map("capabilities")
+}
+
+model ProductCapability {
+  id            String     @id @default(cuid())
+  product_id    String
+  capability_id String
+  product       Product    @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  capability    Capability @relation(fields: [capability_id], references: [id])
+  created_at    DateTime   @default(now())
+
+  @@unique([product_id, capability_id])
+  @@map("product_capabilities")
+}
+
+model RecommendationRule {
+  id                   String   @id @default(cuid())
+  scene_id             String
+  preferred_equipment  String[]
+  forbidden_equipment  String[]
+  weight_scene_match   Float    @default(0.4)
+  weight_param_match   Float    @default(0.25)
+  weight_bid_freq      Float    @default(0.2)
+  weight_supplier_rel  Float    @default(0.1)
+  weight_platform_heat Float    @default(0.05)
+  scene                Scene    @relation(fields: [scene_id], references: [id])
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
+
+  @@map("recommendation_rules")
 }
