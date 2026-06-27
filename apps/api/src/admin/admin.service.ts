@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
-import { ReviewStatus } from "@prisma/client";
+import { ReviewStatus, Prisma } from "@prisma/client";
 
 @Injectable()
 export class AdminService {
@@ -130,7 +130,7 @@ export class AdminService {
     field_label: string;
     field_type: string;
     unit?: string;
-    options?: any;
+    options?: Prisma.InputJsonValue;
     sort_order?: number;
     is_required?: boolean;
     is_filterable?: boolean;

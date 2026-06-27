@@ -39,7 +39,7 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
     setLoading(true);
     try {
       // API call to POST /api/inquiries (mocked or actual request)
-      const res = await Taro.request({
+      await Taro.request({
         url: "http://localhost:3000/api/inquiries",
         method: "POST",
         data: {
@@ -50,11 +50,10 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
           remark: remark.trim()
         }
       }).catch(() => null);
-
       Taro.showToast({ title: "询价线索已提交", icon: "success" });
       if (onSuccess) onSuccess();
       onClose();
-    } catch (e) {
+    } catch {
       Taro.showToast({ title: "提交失败，请稍后再试", icon: "none" });
     } finally {
       setLoading(false);

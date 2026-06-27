@@ -60,7 +60,7 @@ export default function CategoriesPage() {
           showLine
           defaultExpandAll
           treeData={treeData}
-          titleRender={(nodeData: any) => (
+          titleRender={(nodeData: Record<string, unknown>) => (
             <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "space-between", width: 400 }}>
               <span>{nodeData.title}</span>
               <Space size="small">

@@ -55,7 +55,7 @@ export default function CompanyPage() {
       {/* 审核状态 Alert Banner */}
       {reviewStatus === "已通过" && (
         <Alert
-          message="✅ 企业身份认证成功（已通过平台核验）"
+          title="✅ 企业身份认证成功（已通过平台核验）"
           description="您的企业主体资质及三证信息已通过平台客服审核，获得专属【已认证供应商】金标标识，享优先线索撮合权益。"
           type="success"
           showIcon
@@ -65,7 +65,7 @@ export default function CompanyPage() {
 
       {reviewStatus === "待审核" && (
         <Alert
-          message="⏳ 企业资质变更复核中"
+          title="⏳ 企业资质变更复核中"
           description="您提交的新变更企业主体资质正在由平台合规部处理，预计在 1 个工作日内完成核验。"
           type="warning"
           showIcon
@@ -75,7 +75,7 @@ export default function CompanyPage() {
 
       {reviewStatus === "已驳回" && (
         <Alert
-          message="❌ 企业资质认证未通过"
+          title="❌ 企业资质认证未通过"
           description="原因：营业执照复印件加盖公章模糊，请重新上传清晰清晰扫描件。"
           type="error"
           showIcon

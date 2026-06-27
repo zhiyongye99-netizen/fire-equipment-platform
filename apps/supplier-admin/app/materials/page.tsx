@@ -145,7 +145,7 @@ export default function MaterialsPage() {
 
       {/* 可见范围 Alert 提示 */}
       <Alert
-        message="🛡️ 商业隐私与数据安全保护说明"
+        title="🛡️ 商业隐私与数据安全保护说明"
         description="平台严格执行分级资料体系：敏感检测原件、技术说明书建议设为【申请后可见】或【仅认证用户可见】。未经企业授权，平台绝不向公众或竞品暴露底线商务资质。"
         type="info"
         showIcon

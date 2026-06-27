@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Table, Tabs, Tag, Button, Space, Card, Typography, message } from "antd";
+import { Table, Tabs, Button, Space, Card, Typography, message } from "antd";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import AuditModal from "@/components/AuditModal";
 import { maskPhone, maskUnifiedCode } from "@/lib/utils";
@@ -9,7 +9,7 @@ import { maskPhone, maskUnifiedCode } from "@/lib/utils";
 export default function ReviewPage() {
   const [activeTab, setActiveTab] = useState("supplier");
   const [modalOpen, setModalOpen] = useState(false);
-  const [currentRecord, setCurrentRecord] = useState<any>(null);
+  const [currentRecord, setCurrentRecord] = useState<Record<string, unknown>>({});
   const [actionType, setActionType] = useState<"approve" | "reject">("approve");
 
   // 模拟数据源
@@ -43,7 +43,7 @@ export default function ReviewPage() {
     },
   ];
 
-  const handleOpenAudit = (record: any, type: "approve" | "reject") => {
+  const handleOpenAudit = (record: Record<string, unknown>, type: "approve" | "reject") => {
     setCurrentRecord(record);
     setActionType(type);
     setModalOpen(true);
@@ -76,7 +76,7 @@ export default function ReviewPage() {
     {
       title: "操作",
       key: "action",
-      render: (_: any, record: any) => (
+      render: (_: unknown, record: Record<string, unknown>) => (
         <Space>
           <Button
             type="primary"
@@ -108,7 +108,7 @@ export default function ReviewPage() {
     {
       title: "操作",
       key: "action",
-      render: (_: any, record: any) => (
+      render: (_: unknown, record: Record<string, unknown>) => (
         <Space>
           <Button
             type="primary"

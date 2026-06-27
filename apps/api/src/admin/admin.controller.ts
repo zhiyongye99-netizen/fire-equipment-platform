@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Param, Query, UseGuards } from "@nestjs/common";
 import { AdminService } from "./admin.service";
 import { AuthGuard } from "../common/guards/auth.guard";
-import { ReviewStatus } from "@prisma/client";
+import { ReviewStatus, Prisma } from "@prisma/client";
 
 @Controller("admin")
 @UseGuards(AuthGuard)
@@ -61,7 +61,7 @@ export class AdminController {
       field_label: string;
       field_type: string;
       unit?: string;
-      options?: any;
+      options?: Prisma.InputJsonValue;
       sort_order?: number;
       is_required?: boolean;
       is_filterable?: boolean;

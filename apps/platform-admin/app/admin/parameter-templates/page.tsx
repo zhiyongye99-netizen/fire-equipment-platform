@@ -32,7 +32,7 @@ export default function ParameterTemplatesPage() {
     {
       title: "必填/筛选/对比属性",
       key: "attrs",
-      render: (_: any, r: any) => (
+      render: (_: unknown, r: Record<string, unknown>) => (
         <Space>
           {r.is_required && <Tag color="red">必填</Tag>}
           {r.is_filterable && <Tag color="green">可筛选</Tag>}

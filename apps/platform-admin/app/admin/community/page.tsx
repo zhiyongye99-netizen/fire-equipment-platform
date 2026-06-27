@@ -9,7 +9,7 @@ import { maskPhone } from "@/lib/utils";
 export default function CommunityPage() {
   const [activeTab, setActiveTab] = useState("posts");
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [currentPost, setCurrentPost] = useState<any>(null);
+  const [currentPost, setCurrentPost] = useState<Record<string, unknown>>({}); 
   const [actionType, setActionType] = useState<"takedown" | "ban">("takedown");
 
   const mockPosts = [
@@ -33,7 +33,7 @@ export default function CommunityPage() {
     },
   ];
 
-  const handleActionClick = (record: any, type: "takedown" | "ban") => {
+  const handleActionClick = (record: Record<string, unknown>, type: "takedown" | "ban") => {
     setCurrentPost(record);
     setActionType(type);
     setConfirmOpen(true);
@@ -62,7 +62,7 @@ export default function CommunityPage() {
     {
       title: "治理动作",
       key: "action",
-      render: (_: any, record: any) => (
+      render: (_: unknown, record: Record<string, unknown>) => (
         <Space>
           <Button icon={<PushpinOutlined />} size="small" onClick={() => message.success("已成功置顶该帖！")}>置顶</Button>
           <Button icon={<StarOutlined />} size="small" onClick={() => message.success("已加精该实战经验帖！")}>加精</Button>
