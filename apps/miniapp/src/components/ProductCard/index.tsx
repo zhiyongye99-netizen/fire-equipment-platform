@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Image } from "@tarojs/components";
+import { View, Text, Image, type ITouchEvent } from "@tarojs/components";
 import Taro from "@tarojs/taro";
 import "./index.scss";
 
@@ -35,16 +35,23 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     });
   };
 
-  const handleCheckboxClick = (e: any) => {
+  const handleCheckboxClick = (e: ITouchEvent) => {
     e.stopPropagation();
     if (onToggleCompare) {
       onToggleCompare(product.id);
     }
   };
 
-  const handleDetailBtnClick = (e: any) => {
+  const handleDetailBtnClick = (e: ITouchEvent) => {
     e.stopPropagation();
     handleCardClick();
+  };
+
+  const handleInquiryClick = (e: ITouchEvent) => {
+    e.stopPropagation();
+    if (onInquiry) {
+      onInquiry(product);
+    }
   };
 
   return (
@@ -89,6 +96,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         <View className="specs-line">
           <Text className="specs-text">{product.specsLine || "⚙ 流量: 180L/s   ⛰ 水罐: 10t   👤 乘员: 6人"}</Text>
         </View>
+
+        {onInquiry && (
+          <View className="btn-inquiry" onClick={handleInquiryClick}>
+            询价/索资料
+          </View>
+        )}
       </View>
     </View>
   );
