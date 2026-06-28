@@ -16,14 +16,14 @@ export async function wechatLogin(): Promise<AuthUser | null> {
     // 1. 调用 wx.login 拿 code
     const loginRes = await Taro.login();
     // 2. 用 code 换 token
-    const res = await api.auth.wechat({ code: loginRes.code }).catch(() => null);
+    const res = await api.auth.wechat({ code: loginRes.code });
     if (res && res.data) {
       Taro.setStorageSync(TOKEN_KEY, res.data.token);
       Taro.setStorageSync(USER_KEY, res.data.user);
       return res.data.user;
     }
   } catch {
-    // 忽略未启动后端 API 时的静默报错
+    console.warn("微信登录失败，将以游客身份浏览");
   }
   return null;
 }

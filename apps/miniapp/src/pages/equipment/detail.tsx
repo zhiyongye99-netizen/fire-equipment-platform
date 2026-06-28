@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Swiper, SwiperItem, Image, ScrollView } from "@tarojs/components";
+import { View, Text, Swiper, SwiperItem, ScrollView } from "@tarojs/components";
 import Taro, { useRouter } from "@tarojs/taro";
 import { InquiryModal } from "../../components/InquiryModal";
 import { toggleCompareId, subscribeCompare } from "../../utils/compareStore";
@@ -11,7 +11,7 @@ interface DetailProduct {
   categoryName: string;
   supplierName: string;
   priceRange: string;
-  images: string[];
+  imageLabels: string[];
   tags: string[];
   overview: string;
   parameters: Record<string, string>;
@@ -24,11 +24,7 @@ const MOCK_DETAIL: DetailProduct = {
   categoryName: "防汛排涝",
   supplierName: "捷达消防装备有限公司",
   priceRange: "¥120万 - ¥150万",
-  images: [
-    "https://dummyimage.com/600x400/eaecf0/101828&text=装备外观大图",
-    "https://dummyimage.com/600x400/d0d5dd/101828&text=抽排水泵细节图",
-    "https://dummyimage.com/600x400/98a2b3/101828&text=控制面板实拍"
-  ],
+  imageLabels: ["装备外观", "装备细节", "操作面板"],
   tags: ["城市内涝", "强力抽水", "自备动力", "应急抢险"],
   overview: "该车型专为城市地下空间、下沉式立交桥、隧道及农田水利暴雨积水快速抽排设计。配备车载自备柴油动力机组与高效率大流量潜水泵，具备快速部署与连续无故障作业能力。",
   parameters: {
@@ -85,9 +81,12 @@ export default function DetailPage() {
       <ScrollView className="detail-scroll-body" scrollY>
         {/* 大图轮播 */}
         <Swiper className="image-swiper" circular autoplay indicatorDots indicatorColor="rgba(255,255,255,0.5)" indicatorActiveColor="#ffffff">
-          {product.images.map((img, idx) => (
+          {product.imageLabels.map((label, idx) => (
             <SwiperItem key={idx}>
-              <Image className="swiper-img" src={img} mode="aspectFill" />
+              <View className="swiper-img placeholder-img">
+                <Text className="placeholder-title">{label}</Text>
+                <Text className="placeholder-sub">图片待上传</Text>
+              </View>
             </SwiperItem>
           ))}
         </Swiper>

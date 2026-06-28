@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView, Image } from "@tarojs/components";
+import { View, Text, ScrollView } from "@tarojs/components";
 import Taro, { useRouter } from "@tarojs/taro";
 import { InquiryModal } from "../../../components/InquiryModal";
 import { getCompareIds, toggleCompareId, subscribeCompare } from "../../../utils/compareStore";
@@ -9,7 +9,7 @@ interface CompareProduct {
   id: string;
   name: string;
   supplierName: string;
-  coverImage: string;
+  imageLabel: string;
   priceRange: string;
   sections: {
     title: string;
@@ -23,7 +23,7 @@ const MOCK_COMPARE_DATA: Record<string, CompareProduct> = {
     id: "prod-101",
     name: "32米举高喷射消防车",
     supplierName: "中联重科",
-    coverImage: "https://dummyimage.com/200x150/eaecf0/101828&text=举高车",
+    imageLabel: "举高车",
     priceRange: "¥380万",
     sections: [
       {
@@ -60,7 +60,7 @@ const MOCK_COMPARE_DATA: Record<string, CompareProduct> = {
     id: "prod-102",
     name: "18吨泡沫消防车",
     supplierName: "中联重科",
-    coverImage: "https://dummyimage.com/200x150/d0d5dd/101828&text=泡沫车",
+    imageLabel: "泡沫车",
     priceRange: "¥180万",
     sections: [
       {
@@ -97,7 +97,7 @@ const MOCK_COMPARE_DATA: Record<string, CompareProduct> = {
     id: "prod-103",
     name: "城市主战消防车",
     supplierName: "徐工消防",
-    coverImage: "https://dummyimage.com/200x150/98a2b3/101828&text=主战车",
+    imageLabel: "主战车",
     priceRange: "¥220万",
     sections: [
       {
@@ -159,7 +159,9 @@ export default function ComparePage() {
     return () => unsubscribe();
   }, [router.params.ids]);
 
-  const products = ids.map(id => MOCK_COMPARE_DATA[id] || MOCK_COMPARE_DATA["prod-101"]);
+  const products = ids
+    .map(id => MOCK_COMPARE_DATA[id])
+    .filter((product): product is CompareProduct => Boolean(product));
 
   const handleRemoveProduct = (id: string) => {
     toggleCompareId(id);
@@ -190,7 +192,9 @@ export default function ComparePage() {
           {products.map(p => (
             <View key={p.id} className="top-prod-card">
               <View className="remove-cross" onClick={() => handleRemoveProduct(p.id)}>✕</View>
-              <Image className="card-img" src={p.coverImage} mode="aspectFill" />
+              <View className="card-img placeholder-img">
+                <Text>{p.imageLabel}</Text>
+              </View>
               <Text className="card-title">{p.name}</Text>
             </View>
           ))}

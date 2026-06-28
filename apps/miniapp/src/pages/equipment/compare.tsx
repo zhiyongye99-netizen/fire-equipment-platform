@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView, Image } from "@tarojs/components";
+import { View, Text, ScrollView } from "@tarojs/components";
 import Taro, { useRouter } from "@tarojs/taro";
 import { InquiryModal } from "../../components/InquiryModal";
 import { getCompareIds, toggleCompareId, subscribeCompare } from "../../utils/compareStore";
@@ -9,7 +9,7 @@ interface CompareProduct {
   id: string;
   name: string;
   supplierName: string;
-  coverImage: string;
+  imageLabel: string;
   priceRange: string;
   parameters: Record<string, string>;
 }
@@ -19,7 +19,7 @@ const MOCK_COMPARE_DATA: Record<string, CompareProduct> = {
     id: "prod-101",
     name: "大流量排水抢险车 (5000m³/h)",
     supplierName: "捷达消防公司",
-    coverImage: "https://dummyimage.com/200x150/eaecf0/101828&text=排涝车",
+    imageLabel: "排涝车",
     priceRange: "¥120万-150万",
     parameters: {
       "分类/领域": "防汛排涝",
@@ -34,7 +34,7 @@ const MOCK_COMPARE_DATA: Record<string, CompareProduct> = {
     id: "prod-102",
     name: "54米举高喷射消防车",
     supplierName: "三一重工",
-    coverImage: "https://dummyimage.com/200x150/d0d5dd/101828&text=举高车",
+    imageLabel: "举高车",
     priceRange: "¥380万-420万",
     parameters: {
       "分类/领域": "消防车辆",
@@ -49,7 +49,7 @@ const MOCK_COMPARE_DATA: Record<string, CompareProduct> = {
     id: "prod-103",
     name: "重载救援无人机",
     supplierName: "晨光智能",
-    coverImage: "https://dummyimage.com/200x150/98a2b3/101828&text=无人机",
+    imageLabel: "无人机",
     priceRange: "¥25万-35万",
     parameters: {
       "分类/领域": "无人装备",
@@ -64,7 +64,7 @@ const MOCK_COMPARE_DATA: Record<string, CompareProduct> = {
     id: "prod-104",
     name: "激流救生冲锋艇",
     supplierName: "威海广泰",
-    coverImage: "https://dummyimage.com/200x150/667085/ffffff&text=冲锋艇",
+    imageLabel: "冲锋艇",
     priceRange: "¥8.5万-12万",
     parameters: {
       "分类/领域": "水域救援",
@@ -97,7 +97,9 @@ export default function ComparePage() {
     return () => unsubscribe();
   }, [router.params.ids]);
 
-  const products = ids.map(id => MOCK_COMPARE_DATA[id] || MOCK_COMPARE_DATA["prod-101"]);
+  const products = ids
+    .map(id => MOCK_COMPARE_DATA[id])
+    .filter((product): product is CompareProduct => Boolean(product));
 
   const handleRemoveProduct = (id: string) => {
     toggleCompareId(id);
@@ -147,7 +149,9 @@ export default function ComparePage() {
             {products.map(p => (
               <View key={p.id} className="product-col-cell header-cell">
                 <View className="remove-btn" onClick={() => handleRemoveProduct(p.id)}>✕ 移除</View>
-                <Image className="col-img" src={p.coverImage} mode="aspectFill" />
+                <View className="col-img placeholder-img">
+                  <Text>{p.imageLabel}</Text>
+                </View>
                 <Text className="col-title">{p.name}</Text>
                 <Text className="col-price">{p.priceRange}</Text>
                 <View className="col-inquiry-btn" onClick={() => setInquiryTarget(p)}>

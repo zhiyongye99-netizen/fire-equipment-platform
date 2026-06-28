@@ -55,11 +55,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   return (
     <View className="product-card-02" onClick={handleCardClick}>
       <View className="thumbnail-wrapper">
-        <Image
-          className="product-img"
-          src={product.coverImage || "https://dummyimage.com/240x180/eaecf0/667085&text=消防车"}
-          mode="aspectFill"
-        />
+        {product.coverImage ? (
+          <Image className="product-img" src={product.coverImage} mode="aspectFill" />
+        ) : (
+          <View className="product-placeholder">
+            <Text className="placeholder-title">装备图片</Text>
+          </View>
+        )}
       </View>
 
       <View className="card-right-content">
@@ -81,7 +83,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         )}
 
         <View className="row-specs">
-          <Text className="specs-text">{product.specsLine || "💧 水罐: 18吨   🔄 流量: 180L/s   👤 乘员: 6人"}</Text>
+          <Text className="specs-text">{product.specsLine || "核心参数待完善"}</Text>
         </View>
 
         <View className="row-bottom">

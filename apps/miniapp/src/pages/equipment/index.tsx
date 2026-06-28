@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Input, ScrollView, Image } from "@tarojs/components";
+import { View, Text, Input, ScrollView } from "@tarojs/components";
 import Taro from "@tarojs/taro";
 import { ProductCard, ProductItem } from "../../components/ProductCard";
 import { InquiryModal } from "../../components/InquiryModal";
@@ -25,64 +25,15 @@ const HOT_SEARCHES = [
   "排烟排涝", "主战车型", "国六底盘", "300-500万"
 ];
 
-const MOCK_PRODUCTS: ProductItem[] = [
-  {
-    id: "prod-101",
-    name: "18吨水罐消防车",
-    supplierName: "中联重科",
-    specsLine: "💧 水罐: 18吨   🔄 流量: 180L/s   👤 乘员: 6人",
-    tags: [
-      { text: "主战推荐", color: "red" },
-      { text: "高性能比", color: "blue" },
-      { text: "实战应用", color: "green" }
-    ],
-    coverImage: "https://dummyimage.com/240x180/eaecf0/101828&text=18吨水罐车"
-  },
-  {
-    id: "prod-102",
-    name: "18吨泡沫消防车",
-    supplierName: "徐工消防",
-    specsLine: "💧 泡沫: 18吨   🔄 流量: 160L/s   👤 乘员: 6人",
-    tags: [
-      { text: "高效灭火", color: "red" },
-      { text: "徐工消防", color: "blue" },
-      { text: "国六底盘", color: "green" }
-    ],
-    coverImage: "https://dummyimage.com/240x180/d0d5dd/101828&text=18吨泡沫车"
-  },
-  {
-    id: "prod-103",
-    name: "32米云梯消防车",
-    supplierName: "三一应急",
-    specsLine: "⚙ 作业高度: 32m   ⛰ 载重: 400kg   👤 乘员: 3人",
-    tags: [
-      { text: "高层灭火", color: "red" },
-      { text: "三一应急", color: "blue" },
-      { text: "实战应用", color: "green" }
-    ],
-    coverImage: "https://dummyimage.com/240x180/98a2b3/101828&text=32米云梯车"
-  },
-  {
-    id: "prod-104",
-    name: "抢险救援消防车",
-    supplierName: "捷达消防",
-    specsLine: "⚙ 牵引力: 120kN   ⛰ 涉水深度: 1.2m   👤 乘员: 6人",
-    tags: [
-      { text: "多功能救援", color: "red" },
-      { text: "捷达消防", color: "blue" },
-      { text: "实战应用", color: "green" }
-    ],
-    coverImage: "https://dummyimage.com/240x180/667085/ffffff&text=抢险救援车"
-  }
-];
-
 export default function EquipmentPage() {
   const [activeTopTab, setActiveTopTab] = useState("车辆");
   const [searchKey, setSearchKey] = useState("");
   const [activeHotSearch, setActiveHotSearch] = useState("主战车型");
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [inquiryTarget, setInquiryTarget] = useState<ProductItem | null>(null);
-  const [products, setProducts] = useState<ProductItem[]>(MOCK_PRODUCTS);
+  const [products, setProducts] = useState<ProductItem[]>([]);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
+  const [productLoadError, setProductLoadError] = useState("");
 
   useEffect(() => {
     const unsubscribe = subscribeCompare(ids => {
@@ -92,15 +43,41 @@ export default function EquipmentPage() {
   }, []);
 
   useEffect(() => {
+    let isMounted = true;
+    setIsLoadingProducts(true);
+    setProductLoadError("");
+
     api.products.list({ limit: 20 })
       .then((res) => {
-        if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
-          setProducts(res.data as unknown as ProductItem[]);
+        if (!isMounted) {
+          return;
         }
+
+        if (res && Array.isArray(res.data)) {
+          setProducts(res.data as unknown as ProductItem[]);
+          return;
+        }
+
+        setProducts([]);
+        setProductLoadError("装备数据暂时不可用");
       })
       .catch(() => {
-        // 静默保底
+        if (!isMounted) {
+          return;
+        }
+
+        setProducts([]);
+        setProductLoadError("装备数据加载失败，请稍后重试");
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsLoadingProducts(false);
+        }
       });
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const handleToggleCompare = (id: string) => {
@@ -209,16 +186,33 @@ export default function EquipmentPage() {
             <Text className="b-sub">精选高性能主战车型，助力科学选型</Text>
             <View className="btn-banner-action">立即查看 &gt;</View>
           </View>
-          <Image
-            className="banner-img"
-            src="https://dummyimage.com/220x130/1677ff/ffffff&text=主战车型"
-            mode="aspectFit"
-          />
+          <View className="banner-visual-placeholder">
+            <Text className="banner-visual-main">主战车型</Text>
+            <Text className="banner-visual-sub">参数参考</Text>
+          </View>
         </View>
 
         {/* 装备产品列表卡片流 */}
         <View className="products-list-stream">
-          {products.map(p => (
+          {isLoadingProducts && (
+            <View className="list-state loading-state">
+              <Text>装备数据加载中...</Text>
+            </View>
+          )}
+
+          {!isLoadingProducts && productLoadError && (
+            <View className="list-state error-state">
+              <Text>{productLoadError}</Text>
+            </View>
+          )}
+
+          {!isLoadingProducts && !productLoadError && products.length === 0 && (
+            <View className="list-state empty-state">
+              <Text>暂无装备数据</Text>
+            </View>
+          )}
+
+          {!isLoadingProducts && !productLoadError && products.map(p => (
             <ProductCard
               key={p.id}
               product={p}
