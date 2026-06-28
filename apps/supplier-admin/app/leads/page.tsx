@@ -164,21 +164,21 @@ export default function LeadsPage() {
       </Typography.Title>
 
       <Alert
-        message="🔒 消防用户隐私安全保护规则"
+        title="🔒 消防用户隐私安全保护规则"
         description="所有意向线索均为实名消防采购/战训人员留痕提交。用户手机号等敏感联系方式默认实行【脱敏保护】，跟进时请通过平台安全通道或申请解锁完整联系方式。"
         type="warning"
         showIcon
         style={{ marginBottom: 20 }}
       />
 
-      <Card bordered={false} style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
+      <Card variant="borderless" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
         <Table columns={columns} dataSource={leads} rowKey="key" pagination={{ pageSize: 10 }} />
       </Card>
 
       {/* 线索详解 Drawer 抽屉 */}
       <Drawer
         title={`🎯 采购线索详情 - ${selectedLead?.userName || ""}`}
-        width={560}
+        size={560}
         open={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
       >

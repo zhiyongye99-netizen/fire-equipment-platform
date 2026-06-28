@@ -145,26 +145,26 @@ export default function MaterialsPage() {
 
       {/* 可见范围 Alert 提示 */}
       <Alert
-        message="🛡️ 商业隐私与数据安全保护说明"
+        title="🛡️ 商业隐私与数据安全保护说明"
         description="平台严格执行分级资料体系：敏感检测原件、技术说明书建议设为【申请后可见】或【仅认证用户可见】。未经企业授权，平台绝不向公众或竞品暴露底线商务资质。"
         type="info"
         showIcon
         style={{ marginBottom: 20 }}
       />
 
-      <Card bordered={false} style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
-        <Table columns={columns} dataSource={materials} rowKey="key" pagination={{ pageSize: 10 }} />
+      <Card variant="borderless" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
+        <Table columns={columns} dataSource={materials} rowKey="key" pagination={{ pageSize: 5 }} />
       </Card>
 
-      {/* 上传资料 Modal */}
+      {/* 上传新资料 Modal */}
       <Modal
-        title="📤 上传装备产品检测/资质文件"
+        title="📤 上传产品检测资料 / 资质证书"
         open={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
         onOk={handleUploadMaterial}
         okText="确认上传并提交审核"
         cancelText="取消"
-        destroyOnClose
+        destroyOnHidden
       >
         <Form form={form} layout="vertical" initialValues={{ privacyLevel: "申请后可见", type: "国家检测报告" }} style={{ marginTop: 16 }}>
           <Form.Item name="relatedProduct" label="关联装备产品" rules={[{ required: true, message: "请选择关联的产品" }]}>

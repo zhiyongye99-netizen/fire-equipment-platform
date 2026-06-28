@@ -1,13 +1,18 @@
- "use client";
+"use client";
 
-import { Card, Typography } from "antd";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function PlatformAdminHomePage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    router.replace("/admin/review");
+  }, [router]);
+
   return (
-    <main style={{ padding: 24 }}>
-      <Card>
-        <Typography.Title level={1}>平台运营后台</Typography.Title>
-      </Card>
+    <main style={{ padding: 24, textAlign: "center" }}>
+      <p>正在进入平台运营后台...</p>
     </main>
   );
 }
