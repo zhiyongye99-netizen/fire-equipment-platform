@@ -22,7 +22,7 @@ export async function wechatLogin(): Promise<AuthUser | null> {
       Taro.setStorageSync(USER_KEY, res.data.user);
       return res.data.user;
     }
-  } catch (e) {
+  } catch {
     // 忽略未启动后端 API 时的静默报错
   }
   return null;

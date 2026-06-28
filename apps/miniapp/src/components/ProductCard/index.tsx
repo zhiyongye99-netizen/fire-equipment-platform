@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Image } from "@tarojs/components";
+import { View, Text, Image, type ITouchEvent } from "@tarojs/components";
 import Taro from "@tarojs/taro";
 import "./index.scss";
 
@@ -24,7 +24,8 @@ interface ProductCardProps {
 export const ProductCard: React.FC<ProductCardProps> = ({
   product,
   isCompared = false,
-  onToggleCompare
+  onToggleCompare,
+  onInquiry
 }) => {
   const handleCardClick = () => {
     Taro.navigateTo({
@@ -32,16 +33,23 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     });
   };
 
-  const handleCompareClick = (e: any) => {
+  const handleCompareClick = (e: ITouchEvent) => {
     e.stopPropagation();
     if (onToggleCompare) {
       onToggleCompare(product.id);
     }
   };
 
-  const handleDetailBtnClick = (e: any) => {
+  const handleDetailBtnClick = (e: ITouchEvent) => {
     e.stopPropagation();
     handleCardClick();
+  };
+
+  const handleInquiryClick = (e: ITouchEvent) => {
+    e.stopPropagation();
+    if (onInquiry) {
+      onInquiry(product);
+    }
   };
 
   return (
@@ -85,6 +93,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             <Text className="check-text">加入对比</Text>
           </View>
         </View>
+
+        {onInquiry && (
+          <View className="btn-inquiry" onClick={handleInquiryClick}>
+            询价/索资料
+          </View>
+        )}
       </View>
     </View>
   );

@@ -10,7 +10,7 @@ export function getCompareIds(): string[] {
   try {
     const data = Taro.getStorageSync(COMPARE_STORAGE_KEY);
     return Array.isArray(data) ? data : [];
-  } catch (e) {
+  } catch {
     return [];
   }
 }

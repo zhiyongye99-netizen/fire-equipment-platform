@@ -53,7 +53,7 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
       Taro.showToast({ title: "询价线索已提交", icon: "success" });
       if (onSuccess) onSuccess();
       onClose();
-    } catch (e) {
+    } catch {
       Taro.showToast({ title: "提交失败，请稍后再试", icon: "none" });
     } finally {
       setLoading(false);
