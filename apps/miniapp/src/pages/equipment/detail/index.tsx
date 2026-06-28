@@ -7,6 +7,7 @@ import "./index.scss";
 
 interface DetailProduct {
   id: string;
+  supplierId?: string;
   name: string;
   priceRange: string;
   hotness: number;
@@ -212,6 +213,7 @@ export default function DetailPage() {
       <InquiryModal
         isOpen={isInquiryOpen}
         productId={product.id}
+        supplierId={product.supplierId}
         productName={product.name}
         onClose={() => setIsInquiryOpen(false)}
       />

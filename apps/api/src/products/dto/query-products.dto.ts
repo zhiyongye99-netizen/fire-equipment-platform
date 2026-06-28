@@ -34,4 +34,11 @@ export class QueryProductsDto {
   @Min(1)
   @Max(100)
   page_size?: number = 20;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(1)
+  @Max(100)
+  limit?: number;
 }

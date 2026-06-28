@@ -1,5 +1,6 @@
 import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from "@nestjs/common";
 import * as jwt from "jsonwebtoken";
+import type { JwtPayload } from "jsonwebtoken";
 
 /**
  * Auth Guard — 验证 Bearer JWT token
@@ -19,10 +20,17 @@ export class AuthGuard implements CanActivate {
         auth.slice(7),
         process.env.JWT_SECRET ?? "dev_secret_change_in_production",
       );
+      if (!this.hasSubject(payload)) {
+        throw new UnauthorizedException();
+      }
       request.user = payload;
       return true;
     } catch {
       throw new UnauthorizedException();
     }
+  }
+
+  private hasSubject(payload: string | JwtPayload): payload is JwtPayload & { sub: string } {
+    return typeof payload === "object" && payload !== null && typeof payload.sub === "string";
   }
 }

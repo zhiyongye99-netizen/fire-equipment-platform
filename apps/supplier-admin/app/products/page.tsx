@@ -12,6 +12,8 @@ const STATUS_COLOR: Record<ProductStatus, string> = {
   已上架: "green",
   审核中: "orange",
   草稿: "default",
+  已驳回: "red",
+  已下架: "default",
 };
 
 export default function ProductsPage() {
@@ -48,8 +50,9 @@ export default function ProductsPage() {
     try {
       await productsApi.create({
         name: values.name as string,
-        category: values.category as string,
-        model: values.model as string | undefined,
+        categoryId: values.categoryId as string,
+        modelNo: values.modelNo as string | undefined,
+        brand: values.brand as string | undefined,
         minPrice: values.minPrice as number | undefined,
         maxPrice: values.maxPrice as number | undefined,
         description: values.description as string | undefined,
@@ -164,16 +167,20 @@ export default function ProductsPage() {
             <Input placeholder="例：DG54G1 登高平台消防车" />
           </Form.Item>
 
-          <Form.Item name="category" label="装备分类" rules={[{ required: true, message: "请选择装备分类" }]}>
+          <Form.Item name="categoryId" label="装备分类" rules={[{ required: true, message: "请选择装备分类" }]}>
             <Select placeholder="请选择消防装备分类">
-              <Select.Option value="水罐消防车">水罐消防车</Select.Option>
-              <Select.Option value="举高喷射消防车">举高喷射消防车</Select.Option>
-              <Select.Option value="排水抢险车">排水抢险车</Select.Option>
+              <Select.Option value="cat-tanker">水罐消防车</Select.Option>
+              <Select.Option value="cat-aerial">举高喷射消防车</Select.Option>
+              <Select.Option value="cat-drain">排水抢险车</Select.Option>
             </Select>
           </Form.Item>
 
-          <Form.Item name="model" label="规格型号">
+          <Form.Item name="modelNo" label="规格型号">
             <Input placeholder="例：SX5310GXF" />
+          </Form.Item>
+
+          <Form.Item name="brand" label="品牌">
+            <Input placeholder="例：中联重科 / 徐工消防" />
           </Form.Item>
 
           <Form.Item label="估算价格区间（万元）">

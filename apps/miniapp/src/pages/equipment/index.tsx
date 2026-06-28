@@ -4,7 +4,7 @@ import Taro from "@tarojs/taro";
 import { ProductCard, ProductItem } from "../../components/ProductCard";
 import { InquiryModal } from "../../components/InquiryModal";
 import { toggleCompareId, subscribeCompare } from "../../utils/compareStore";
-import { api } from "../../utils/api";
+import { api, ApiProduct } from "../../utils/api";
 import "./index.scss";
 
 const TOP_TABS = ["车辆", "灭火", "水域", "无人装备"];
@@ -24,6 +24,28 @@ const HOT_SEARCHES = [
   "水罐消防车", "泡沫消防车", "抢险救援车", "云梯消防车",
   "排烟排涝", "主战车型", "国六底盘", "300-500万"
 ];
+
+function toProductItem(product: ApiProduct): ProductItem {
+  const priceRange =
+    product.price_min && product.price_max
+      ? `${product.price_min} - ${product.price_max} 元`
+      : "暂无报价";
+
+  return {
+    id: product.id,
+    name: product.name,
+    supplierId: product.supplier?.id,
+    categoryName: product.category?.name,
+    supplierName: product.supplier?.short_name || product.supplier?.name,
+    coverImage: product.cover_image_url ?? undefined,
+    priceRange,
+    tags: [
+      ...(product.is_featured ? [{ text: "推荐", color: "red" as const }] : []),
+      ...(product.brand ? [{ text: product.brand, color: "blue" as const }] : []),
+    ],
+    specsLine: product.description || product.model_no || "核心参数待完善",
+  };
+}
 
 export default function EquipmentPage() {
   const [activeTopTab, setActiveTopTab] = useState("车辆");
@@ -47,14 +69,14 @@ export default function EquipmentPage() {
     setIsLoadingProducts(true);
     setProductLoadError("");
 
-    api.products.list({ limit: 20 })
+    api.products.list({ page_size: 20 })
       .then((res) => {
         if (!isMounted) {
           return;
         }
 
         if (res && Array.isArray(res.data)) {
-          setProducts(res.data as unknown as ProductItem[]);
+          setProducts(res.data.map(toProductItem));
           return;
         }
 
@@ -228,6 +250,7 @@ export default function EquipmentPage() {
       <InquiryModal
         isOpen={!!inquiryTarget}
         productId={inquiryTarget?.id || ""}
+        supplierId={inquiryTarget?.supplierId}
         productName={inquiryTarget?.name || ""}
         onClose={() => setInquiryTarget(null)}
       />

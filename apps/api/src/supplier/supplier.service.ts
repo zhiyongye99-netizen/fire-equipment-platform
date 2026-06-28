@@ -46,8 +46,9 @@ export class SupplierService {
         description: dto.description ?? null,
         price_min: dto.price_min ?? null,
         price_max: dto.price_max ?? null,
-        review_status: ReviewStatus.draft,
+        review_status: dto.submit_for_review ? ReviewStatus.pending : ReviewStatus.draft,
       },
+      include: { category: true },
     });
   }
 
