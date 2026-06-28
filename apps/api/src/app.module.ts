@@ -8,6 +8,7 @@ import { SuppliersModule } from "./suppliers/suppliers.module";
 import { LeadsModule } from "./leads/leads.module";
 import { RecommendModule } from "./recommend/recommend.module";
 import { AdminModule } from "./admin/admin.module";
+import { SupplierModule } from "./supplier/supplier.module";
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { AdminModule } from "./admin/admin.module";
     LeadsModule,
     RecommendModule,
     AdminModule,
+    SupplierModule,
   ],
   controllers: [HealthController],
   providers: [
