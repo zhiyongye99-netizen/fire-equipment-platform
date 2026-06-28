@@ -1,141 +1,118 @@
 "use client";
 
-import React, { useState } from "react";
-import { Table, Button, Tag, Space, Modal, Form, Input, Select, InputNumber, Typography, Card, message } from "antd";
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  Table, Button, Tag, Space, Modal, Form, Input,
+  Select, InputNumber, Typography, Card, message, Spin, Alert,
+} from "antd";
+import { productsApi, ApiError } from "@/lib/api";
+import type { Product, ProductStatus } from "@/lib/api";
 
-interface ProductItem {
-  key: string;
-  name: string;
-  model: string;
-  category: string;
-  priceRange: string;
-  status: "草稿" | "审核中" | "已上架" | "已驳回";
-  updatedAt: string;
-}
-
-const initialProducts: ProductItem[] = [
-  {
-    key: "1",
-    name: "DG54G1 登高平台消防车",
-    model: "DG54G1",
-    category: "举高喷射消防车",
-    priceRange: "450 - 520 万元",
-    status: "已上架",
-    updatedAt: "2026-06-20"
-  },
-  {
-    key: "2",
-    name: "AP40 压缩空气泡沫消防车",
-    model: "AP40/CAFS",
-    category: "水罐消防车",
-    priceRange: "180 - 220 万元",
-    status: "已上架",
-    updatedAt: "2026-06-22"
-  },
-  {
-    key: "3",
-    name: "PM180 大流量抢险排水车",
-    model: "PM180-DRAIN",
-    category: "排水抢险车",
-    priceRange: "120 - 150 万元",
-    status: "审核中",
-    updatedAt: "2026-06-26"
-  },
-  {
-    key: "4",
-    name: "SX60 重型破拆救援车",
-    model: "SX60-RESCUE",
-    category: "水罐消防车",
-    priceRange: "260 - 300 万元",
-    status: "草稿",
-    updatedAt: "2026-06-27"
-  }
-];
+const STATUS_COLOR: Record<ProductStatus, string> = {
+  已上架: "green",
+  审核中: "orange",
+  草稿: "default",
+};
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState<ProductItem[]>(initialProducts);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [form] = Form.useForm();
 
-  const handleCreateProduct = (isSubmitForReview: boolean) => {
-    form.validateFields().then((values) => {
-      const minPrice = values.minPrice || 0;
-      const maxPrice = values.maxPrice || 0;
-      const newProduct: ProductItem = {
-        key: Date.now().toString(),
-        name: values.name,
-        model: values.model || "通用款",
-        category: values.category,
-        priceRange: minPrice && maxPrice ? `${minPrice} - ${maxPrice} 万元` : "暂无报价",
-        status: isSubmitForReview ? "审核中" : "草稿",
-        updatedAt: new Date().toISOString().split("T")[0]
-      };
+  const fetchProducts = useCallback(async () => {
+    setLoading(true);
+    setFetchError(null);
+    try {
+      const data = await productsApi.list();
+      setProducts(data);
+    } catch (err) {
+      setFetchError(err instanceof ApiError ? err.message : "加载产品列表失败，请稍后重试");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-      setProducts([newProduct, ...products]);
-      message.success(isSubmitForReview ? "新产品已提交审核！" : "产品草稿保存成功！");
+  useEffect(() => { fetchProducts(); }, [fetchProducts]);
+
+  const handleCreateProduct = async (submitForReview: boolean) => {
+    let values: Record<string, unknown>;
+    try {
+      values = await form.validateFields();
+    } catch {
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await productsApi.create({
+        name: values.name as string,
+        category: values.category as string,
+        model: values.model as string | undefined,
+        minPrice: values.minPrice as number | undefined,
+        maxPrice: values.maxPrice as number | undefined,
+        description: values.description as string | undefined,
+        submitForReview,
+      });
+      message.success(submitForReview ? "新产品已提交审核！" : "产品草稿保存成功！");
       setIsModalOpen(false);
       form.resetFields();
-    });
+      fetchProducts();
+    } catch (err) {
+      message.error(err instanceof ApiError ? err.message : "操作失败，请稍后重试");
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  const priceRange = (p: Product) =>
+    p.minPrice != null && p.maxPrice != null
+      ? `${p.minPrice} - ${p.maxPrice} 万元`
+      : "暂无报价";
 
   const columns = [
     {
       title: "装备产品名称",
       dataIndex: "name",
       key: "name",
-      render: (text: string) => <Typography.Text strong>{text}</Typography.Text>
+      render: (text: string) => <Typography.Text strong>{text}</Typography.Text>,
     },
-    {
-      title: "规格型号",
-      dataIndex: "model",
-      key: "model"
-    },
+    { title: "规格型号", dataIndex: "model", key: "model" },
     {
       title: "装备分类",
       dataIndex: "category",
       key: "category",
-      render: (cat: string) => <Tag color="blue">{cat}</Tag>
+      render: (cat: string) => <Tag color="blue">{cat}</Tag>,
     },
     {
       title: "参考价格区间",
-      dataIndex: "priceRange",
-      key: "priceRange"
+      key: "priceRange",
+      render: (_: unknown, record: Product) => priceRange(record),
     },
     {
       title: "状态",
       dataIndex: "status",
       key: "status",
-      render: (status: string) => {
-        const colorMap: Record<string, string> = {
-          已上架: "green",
-          审核中: "orange",
-          草稿: "default",
-          已驳回: "red"
-        };
-        return <Tag color={colorMap[status] || "default"}>{status}</Tag>;
-      }
+      render: (status: ProductStatus) => (
+        <Tag color={STATUS_COLOR[status] ?? "default"}>{status}</Tag>
+      ),
     },
-    {
-      title: "更新时间",
-      dataIndex: "updatedAt",
-      key: "updatedAt"
-    },
+    { title: "更新时间", dataIndex: "updatedAt", key: "updatedAt" },
     {
       title: "操作",
       key: "action",
-      render: (_: unknown, record: ProductItem) => (
+      render: (_: unknown, record: Product) => (
         <Space size="small">
-          <Button type="link" size="small">
-            编辑
-          </Button>
+          <Button type="link" size="small">编辑</Button>
           {record.status === "草稿" && (
             <Button type="link" size="small" style={{ color: "#fa8c16" }}>
               提交审核
             </Button>
           )}
         </Space>
-      )
-    }
+      ),
+    },
   ];
 
   return (
@@ -149,25 +126,36 @@ export default function ProductsPage() {
         </Button>
       </div>
 
+      {fetchError && (
+        <Alert
+          type="error"
+          message={fetchError}
+          action={<Button size="small" onClick={fetchProducts}>重试</Button>}
+          style={{ marginBottom: 16 }}
+          showIcon
+        />
+      )}
+
       <Card variant="borderless" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
-        <Table columns={columns} dataSource={products} rowKey="key" pagination={{ pageSize: 10 }} />
+        <Spin spinning={loading}>
+          <Table columns={columns} dataSource={products} rowKey="id" pagination={{ pageSize: 10 }} />
+        </Spin>
       </Card>
 
-      {/* 录入新产品 Modal */}
       <Modal
         title="➕ 录入消防装备新产品"
         open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
+        onCancel={() => { setIsModalOpen(false); form.resetFields(); }}
         footer={[
-          <Button key="cancel" onClick={() => setIsModalOpen(false)}>
+          <Button key="cancel" onClick={() => { setIsModalOpen(false); form.resetFields(); }}>
             取消
           </Button>,
-          <Button key="draft" onClick={() => handleCreateProduct(false)}>
+          <Button key="draft" loading={submitting} onClick={() => handleCreateProduct(false)}>
             保存为草稿
           </Button>,
-          <Button key="submit" type="primary" onClick={() => handleCreateProduct(true)}>
+          <Button key="submit" type="primary" loading={submitting} onClick={() => handleCreateProduct(true)}>
             提交审核
-          </Button>
+          </Button>,
         ]}
         destroyOnHidden
       >
