@@ -11,9 +11,7 @@ export interface ProductItem {
   coverImage?: string;
   priceRange?: string;
   tags?: { text: string; color: "red" | "blue" | "green" }[];
-  scenes?: string;
   specsLine?: string;
-  parameters?: Record<string, string | number>;
 }
 
 interface ProductCardProps {
@@ -26,8 +24,7 @@ interface ProductCardProps {
 export const ProductCard: React.FC<ProductCardProps> = ({
   product,
   isCompared = false,
-  onToggleCompare,
-  onInquiry
+  onToggleCompare
 }) => {
   const handleCardClick = () => {
     Taro.navigateTo({
@@ -35,7 +32,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     });
   };
 
-  const handleCheckboxClick = (e: any) => {
+  const handleCompareClick = (e: any) => {
     e.stopPropagation();
     if (onToggleCompare) {
       onToggleCompare(product.id);
@@ -48,25 +45,19 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   };
 
   return (
-    <View className="product-card-ui" onClick={handleCardClick}>
-      <View className="thumbnail-box">
+    <View className="product-card-02" onClick={handleCardClick}>
+      <View className="thumbnail-wrapper">
         <Image
           className="product-img"
-          src={product.coverImage || "https://dummyimage.com/240x180/eaecf0/667085&text=装备图片"}
+          src={product.coverImage || "https://dummyimage.com/240x180/eaecf0/667085&text=消防车"}
           mode="aspectFill"
         />
-        <View
-          className={`checkbox-overlay ${isCompared ? "checked" : ""}`}
-          onClick={handleCheckboxClick}
-        >
-          {isCompared ? "✓" : ""}
-        </View>
       </View>
 
-      <View className="info-box">
-        <View className="title-row">
+      <View className="card-right-content">
+        <View className="row-top">
           <Text className="product-title">{product.name}</Text>
-          <View className="btn-view-spec" onClick={handleDetailBtnClick}>
+          <View className="btn-view-param" onClick={handleDetailBtnClick}>
             看参数
           </View>
         </View>
@@ -74,20 +65,25 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         {product.tags && product.tags.length > 0 && (
           <View className="tags-row">
             {product.tags.map((t, idx) => (
-              <Text key={idx} className={`tag-badge tag-${t.color || "blue"}`}>
+              <Text key={idx} className={`tag-chip tag-${t.color || "blue"}`}>
                 {t.text}
               </Text>
             ))}
           </View>
         )}
 
-        <View className="meta-row">
-          <Text className="supplier-text">{product.supplierName || "中联重科"}</Text>
-          <Text className="scene-text">{product.scenes || "城市主战 / 石化园区"}</Text>
+        <View className="row-specs">
+          <Text className="specs-text">{product.specsLine || "💧 水罐: 18吨   🔄 流量: 180L/s   👤 乘员: 6人"}</Text>
         </View>
 
-        <View className="specs-line">
-          <Text className="specs-text">{product.specsLine || "⚙ 流量: 180L/s   ⛰ 水罐: 10t   👤 乘员: 6人"}</Text>
+        <View className="row-bottom">
+          <View
+            className={`compare-check-btn ${isCompared ? "checked" : ""}`}
+            onClick={handleCompareClick}
+          >
+            <Text className="check-box-icon">{isCompared ? "☑" : "☐"}</Text>
+            <Text className="check-text">加入对比</Text>
+          </View>
         </View>
       </View>
     </View>
