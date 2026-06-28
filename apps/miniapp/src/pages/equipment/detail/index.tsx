@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Swiper, SwiperItem, Image, ScrollView } from "@tarojs/components";
+import { View, Text, Swiper, SwiperItem, ScrollView } from "@tarojs/components";
 import Taro, { useRouter } from "@tarojs/taro";
 import { InquiryModal } from "../../../components/InquiryModal";
 import { toggleCompareId, subscribeCompare } from "../../../utils/compareStore";
@@ -10,7 +10,7 @@ interface DetailProduct {
   name: string;
   priceRange: string;
   hotness: number;
-  images: string[];
+  imageLabels: string[];
   tags: string[];
   fourSpecs: { icon: string; val: string; label: string }[];
   coreParams: { label: string; val: string }[];
@@ -22,12 +22,7 @@ const MOCK_DETAIL: DetailProduct = {
   name: "32米举高喷射消防车",
   priceRange: "¥ XXX 万起",
   hotness: 2368,
-  images: [
-    "https://dummyimage.com/600x400/eaecf0/101828&text=举高喷射消防车1",
-    "https://dummyimage.com/600x400/d0d5dd/101828&text=云梯臂展开2",
-    "https://dummyimage.com/600x400/98a2b3/101828&text=驾驶室细节3",
-    "https://dummyimage.com/600x400/667085/ffffff&text=水炮细节4"
-  ],
+  imageLabels: ["装备外观", "作业机构", "驾驶室", "消防炮"],
   tags: ["主战消防车", "国六排放", "3C认证"],
   fourSpecs: [
     { icon: "🧭", val: "32米", label: "最大作业高度" },
@@ -88,27 +83,30 @@ export default function DetailPage() {
             circular
             onChange={e => setCurrentImgIdx(e.detail.current)}
           >
-            {product.images.map((img, idx) => (
+            {product.imageLabels.map((label, idx) => (
               <SwiperItem key={idx}>
-                <Image className="swiper-img" src={img} mode="aspectFill" />
+                <View className="swiper-img placeholder-img">
+                  <Text className="placeholder-title">{label}</Text>
+                  <Text className="placeholder-sub">图片待上传</Text>
+                </View>
               </SwiperItem>
             ))}
           </Swiper>
           <View className="img-counter-badge">
-            {currentImgIdx + 1}/{product.images.length}
+            {currentImgIdx + 1}/{product.imageLabels.length}
           </View>
         </View>
 
         <ScrollView className="thumbs-scroll-row" scrollX scrollWithAnimation>
           <View className="thumbs-list">
-            {product.images.map((img, idx) => (
-              <Image
+            {product.imageLabels.map((label, idx) => (
+              <View
                 key={idx}
                 className={`thumb-img ${currentImgIdx === idx ? "active" : ""}`}
-                src={img}
-                mode="aspectFill"
                 onClick={() => setCurrentImgIdx(idx)}
-              />
+              >
+                <Text className="thumb-label">{label}</Text>
+              </View>
             ))}
             <View className="all-photos-chip">
               <Text className="text">全部 8张</Text>

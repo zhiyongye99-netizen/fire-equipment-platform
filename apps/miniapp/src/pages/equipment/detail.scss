@@ -16,6 +16,26 @@
         width: 100%;
         height: 100%;
       }
+
+      .placeholder-img {
+        background-color: #1d2939;
+        color: #ffffff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        .placeholder-title {
+          font-size: 34rpx;
+          font-weight: 800;
+          margin-bottom: 8rpx;
+        }
+
+        .placeholder-sub {
+          font-size: 24rpx;
+          color: #d0d5dd;
+        }
+      }
     }
 
     .detail-content {
