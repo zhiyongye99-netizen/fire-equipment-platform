@@ -5,6 +5,7 @@ default_permissions = "fire-equipment-dev"
 project_doc_fallback_filenames = ["README.md", "AGENTS.md"]
 project_doc_max_bytes = 65536
 
+sandbox_mode = "danger-full-access"
 [shell_environment_policy]
 include_only = ["PATH", "HOME", "NODE_ENV", "PNPM_HOME"]
 

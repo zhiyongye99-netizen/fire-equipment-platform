@@ -1,53 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Swiper, SwiperItem, ScrollView } from "@tarojs/components";
+import { View, Text, Swiper, SwiperItem, ScrollView, Image } from "@tarojs/components";
 import Taro, { useRouter } from "@tarojs/taro";
 import { InquiryModal } from "../../components/InquiryModal";
 import { toggleCompareId, subscribeCompare } from "../../utils/compareStore";
+import { fetchProductDetail, type DetailProductView } from "../../services/equipment";
 import "./detail.scss";
-
-interface DetailProduct {
-  id: string;
-  name: string;
-  categoryName: string;
-  supplierName: string;
-  priceRange: string;
-  imageLabels: string[];
-  tags: string[];
-  overview: string;
-  parameters: Record<string, string>;
-  materials: { title: string; type: string }[];
-}
-
-const MOCK_DETAIL: DetailProduct = {
-  id: "prod-101",
-  name: "大流量排水抢险车 (5000m³/h)",
-  categoryName: "防汛排涝",
-  supplierName: "捷达消防装备有限公司",
-  priceRange: "¥120万 - ¥150万",
-  imageLabels: ["装备外观", "装备细节", "操作面板"],
-  tags: ["城市内涝", "强力抽水", "自备动力", "应急抢险"],
-  overview: "该车型专为城市地下空间、下沉式立交桥、隧道及农田水利暴雨积水快速抽排设计。配备车载自备柴油动力机组与高效率大流量潜水泵，具备快速部署与连续无故障作业能力。",
-  parameters: {
-    "额定排涝流量": "5000 m³/h",
-    "最大扬程": "30 m",
-    "自吸最大深度": "8 m",
-    "整车出水接口": "DN300 × 4",
-    "车载动力机组功率": "280 kW",
-    "整车排放标准": "国六",
-    "整备质量": "18000 kg",
-    "外形尺寸 (长×宽×高)": "8500 × 2500 × 3400 mm"
-  },
-  materials: [
-    { title: "国家消防装备质量监督检验报告.pdf", type: "PDF" },
-    { title: "大流量排涝车操作与使用说明书.pdf", type: "PDF" }
-  ]
-};
 
 export default function DetailPage() {
   const router = useRouter();
-  const productId = router.params.id || "prod-101";
+  const productId = router.params.id || "";
 
-  const [product] = useState<DetailProduct>(MOCK_DETAIL);
+  const [product, setProduct] = useState<DetailProductView | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [isFavorited, setIsFavorited] = useState(false);
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [isInquiryOpen, setIsInquiryOpen] = useState(false);
@@ -58,6 +23,43 @@ export default function DetailPage() {
     });
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+    setIsLoading(true);
+    setLoadError("");
+
+    if (!productId) {
+      setProduct(null);
+      setLoadError("缺少产品 ID，无法加载详情");
+      setIsLoading(false);
+      return () => {
+        isMounted = false;
+      };
+    }
+
+    fetchProductDetail(productId)
+      .then(item => {
+        if (isMounted) {
+          setProduct(item);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setProduct(null);
+          setLoadError("产品详情加载失败，请稍后重试");
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [productId]);
 
   const isCompared = compareIds.includes(productId);
 
@@ -70,11 +72,39 @@ export default function DetailPage() {
   };
 
   const handleToggleCompare = () => {
+    if (!productId) {
+      Taro.showToast({ title: "缺少产品 ID", icon: "none" });
+      return;
+    }
     const res = toggleCompareId(productId);
     if (!res.success && res.message) {
       Taro.showToast({ title: res.message, icon: "none" });
     }
   };
+
+  if (isLoading) {
+    return (
+      <View className="detail-page-container">
+        <View className="detail-content">
+          <View className="section-card">
+            <Text className="section-title">产品详情加载中...</Text>
+          </View>
+        </View>
+      </View>
+    );
+  }
+
+  if (!product) {
+    return (
+      <View className="detail-page-container">
+        <View className="detail-content">
+          <View className="section-card">
+            <Text className="section-title">{loadError || "未找到产品详情"}</Text>
+          </View>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View className="detail-page-container">
@@ -83,10 +113,14 @@ export default function DetailPage() {
         <Swiper className="image-swiper" circular autoplay indicatorDots indicatorColor="rgba(255,255,255,0.5)" indicatorActiveColor="#ffffff">
           {product.imageLabels.map((label, idx) => (
             <SwiperItem key={idx}>
-              <View className="swiper-img placeholder-img">
-                <Text className="placeholder-title">{label}</Text>
-                <Text className="placeholder-sub">图片待上传</Text>
-              </View>
+              {product.coverImage && idx === 0 ? (
+                <Image className="swiper-img" src={product.coverImage} mode="aspectFill" />
+              ) : (
+                <View className="swiper-img placeholder-img">
+                  <Text className="placeholder-title">{label}</Text>
+                  <Text className="placeholder-sub">图片待上传</Text>
+                </View>
+              )}
             </SwiperItem>
           ))}
         </Swiper>
@@ -128,6 +162,12 @@ export default function DetailPage() {
           <View className="section-card">
             <Text className="section-title">核心技术参数</Text>
             <View className="parameters-grid">
+              {Object.keys(product.parameters).length === 0 && (
+                <View className="param-grid-item">
+                  <Text className="param-label">参数状态</Text>
+                  <Text className="param-value">核心参数待完善</Text>
+                </View>
+              )}
               {Object.entries(product.parameters).map(([key, val]) => (
                 <View key={key} className="param-grid-item">
                   <Text className="param-label">{key}</Text>
@@ -140,6 +180,13 @@ export default function DetailPage() {
           {/* 检测报告与资料下载线索 */}
           <View className="section-card materials-card">
             <Text className="section-title">产品资料与检验证书</Text>
+            {product.materials.length === 0 && (
+              <View className="material-item" onClick={() => setIsInquiryOpen(true)}>
+                <Text className="doc-icon">📄</Text>
+                <Text className="doc-title">资料清单暂未开放，可向供应商索取</Text>
+                <Text className="doc-action">索取资料 →</Text>
+              </View>
+            )}
             {product.materials.map((m, idx) => (
               <View key={idx} className="material-item" onClick={() => setIsInquiryOpen(true)}>
                 <Text className="doc-icon">📄</Text>
@@ -164,7 +211,7 @@ export default function DetailPage() {
         </View>
 
         <View className="btn-inquiry-main" onClick={() => setIsInquiryOpen(true)}>
-          🚀 在线询价 / 索要资料
+          🚀 在线询价 / 索要资料{product.inquiryCount ? `（${product.inquiryCount}）` : ""}
         </View>
       </View>
 
@@ -172,6 +219,7 @@ export default function DetailPage() {
       <InquiryModal
         isOpen={isInquiryOpen}
         productId={product.id}
+        supplierId={product.supplierId}
         productName={product.name}
         onClose={() => setIsInquiryOpen(false)}
       />

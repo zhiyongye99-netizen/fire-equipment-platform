@@ -1,89 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView } from "@tarojs/components";
+import { View, Text, ScrollView, Image } from "@tarojs/components";
 import Taro, { useRouter } from "@tarojs/taro";
 import { InquiryModal } from "../../components/InquiryModal";
 import { getCompareIds, toggleCompareId, subscribeCompare } from "../../utils/compareStore";
+import { fetchCompareProducts, type CompareProductView } from "../../services/equipment";
 import "./compare.scss";
-
-interface CompareProduct {
-  id: string;
-  name: string;
-  supplierName: string;
-  imageLabel: string;
-  priceRange: string;
-  parameters: Record<string, string>;
-}
-
-const MOCK_COMPARE_DATA: Record<string, CompareProduct> = {
-  "prod-101": {
-    id: "prod-101",
-    name: "大流量排水抢险车 (5000m³/h)",
-    supplierName: "捷达消防公司",
-    imageLabel: "排涝车",
-    priceRange: "¥120万-150万",
-    parameters: {
-      "分类/领域": "防汛排涝",
-      "关键指标": "5000 m³/h",
-      "最大扬程": "30 m",
-      "动力功率": "280 kW",
-      "排放标准": "国六",
-      "外形尺寸": "8.5×2.5×3.4m"
-    }
-  },
-  "prod-102": {
-    id: "prod-102",
-    name: "54米举高喷射消防车",
-    supplierName: "三一重工",
-    imageLabel: "举高车",
-    priceRange: "¥380万-420万",
-    parameters: {
-      "分类/领域": "消防车辆",
-      "关键指标": "54 m",
-      "最大扬程": "80 m",
-      "动力功率": "360 kW",
-      "排放标准": "国六",
-      "外形尺寸": "11.8×2.5×3.9m"
-    }
-  },
-  "prod-103": {
-    id: "prod-103",
-    name: "重载救援无人机",
-    supplierName: "晨光智能",
-    imageLabel: "无人机",
-    priceRange: "¥25万-35万",
-    parameters: {
-      "分类/领域": "无人装备",
-      "关键指标": "50 kg 负载",
-      "最大扬程": "10 km 控制",
-      "动力功率": "纯电蓄电池",
-      "排放标准": "零排放",
-      "外形尺寸": "1.8×1.8×0.6m"
-    }
-  },
-  "prod-104": {
-    id: "prod-104",
-    name: "激流救生冲锋艇",
-    supplierName: "威海广泰",
-    imageLabel: "冲锋艇",
-    priceRange: "¥8.5万-12万",
-    parameters: {
-      "分类/领域": "水域救援",
-      "关键指标": "9人 乘载",
-      "最大扬程": "--",
-      "动力功率": "60 HP 舷外机",
-      "排放标准": "汽油机",
-      "外形尺寸": "4.7×1.9×0.8m"
-    }
-  }
-};
-
-const ALL_PARAM_KEYS = ["分类/领域", "关键指标", "最大扬程", "动力功率", "排放标准", "外形尺寸"];
 
 export default function ComparePage() {
   const router = useRouter();
   const [ids, setIds] = useState<string[]>([]);
+  const [products, setProducts] = useState<CompareProductView[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState("");
   const [onlyDiff, setOnlyDiff] = useState(false);
-  const [inquiryTarget, setInquiryTarget] = useState<CompareProduct | null>(null);
+  const [inquiryTarget, setInquiryTarget] = useState<CompareProductView | null>(null);
 
   useEffect(() => {
     const queryIds = router.params.ids ? router.params.ids.split(",") : getCompareIds();
@@ -97,13 +27,52 @@ export default function ComparePage() {
     return () => unsubscribe();
   }, [router.params.ids]);
 
-  const products = ids
-    .map(id => MOCK_COMPARE_DATA[id])
-    .filter((product): product is CompareProduct => Boolean(product));
+  useEffect(() => {
+    let isMounted = true;
+
+    if (ids.length === 0) {
+      setProducts([]);
+      setLoadError("");
+      setIsLoading(false);
+      return () => {
+        isMounted = false;
+      };
+    }
+
+    setIsLoading(true);
+    setLoadError("");
+
+    fetchCompareProducts(ids)
+      .then(items => {
+        if (isMounted) {
+          setProducts(items);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setProducts([]);
+          setLoadError("参数对比数据加载失败，请稍后重试");
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [ids]);
 
   const handleRemoveProduct = (id: string) => {
     toggleCompareId(id);
+    setIds(current => current.filter(item => item !== id));
   };
+
+  const allParamKeys = Array.from(
+    new Set(products.flatMap(product => Object.keys(product.parameters)))
+  );
 
   // Check if a parameter key has different values across selected products
   const isDifferentParam = (key: string) => {
@@ -113,14 +82,35 @@ export default function ComparePage() {
   };
 
   const displayedKeys = onlyDiff
-    ? ALL_PARAM_KEYS.filter(k => isDifferentParam(k))
-    : ALL_PARAM_KEYS;
+    ? allParamKeys.filter(k => isDifferentParam(k))
+    : allParamKeys;
 
-  if (products.length === 0) {
+  if (ids.length === 0) {
     return (
       <View className="compare-empty-container">
         <Text className="empty-icon">⚖️</Text>
         <Text className="empty-text">暂无已选对比装备</Text>
+        <View className="btn-back-selection" onClick={() => Taro.navigateBack()}>
+          返回选装大厅
+        </View>
+      </View>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <View className="compare-empty-container">
+        <Text className="empty-icon">⚖️</Text>
+        <Text className="empty-text">参数对比数据加载中...</Text>
+      </View>
+    );
+  }
+
+  if (loadError || products.length === 0) {
+    return (
+      <View className="compare-empty-container">
+        <Text className="empty-icon">⚖️</Text>
+        <Text className="empty-text">{loadError || "未找到可对比的已审核装备"}</Text>
         <View className="btn-back-selection" onClick={() => Taro.navigateBack()}>
           返回选装大厅
         </View>
@@ -149,9 +139,13 @@ export default function ComparePage() {
             {products.map(p => (
               <View key={p.id} className="product-col-cell header-cell">
                 <View className="remove-btn" onClick={() => handleRemoveProduct(p.id)}>✕ 移除</View>
-                <View className="col-img placeholder-img">
-                  <Text>{p.imageLabel}</Text>
-                </View>
+                {p.coverImage ? (
+                  <Image className="col-img" src={p.coverImage} mode="aspectFill" />
+                ) : (
+                  <View className="col-img placeholder-img">
+                    <Text>{p.imageLabel}</Text>
+                  </View>
+                )}
                 <Text className="col-title">{p.name}</Text>
                 <Text className="col-price">{p.priceRange}</Text>
                 <View className="col-inquiry-btn" onClick={() => setInquiryTarget(p)}>
@@ -185,6 +179,7 @@ export default function ComparePage() {
       <InquiryModal
         isOpen={!!inquiryTarget}
         productId={inquiryTarget?.id || ""}
+        supplierId={inquiryTarget?.supplierId || ""}
         productName={inquiryTarget?.name || ""}
         onClose={() => setInquiryTarget(null)}
       />
