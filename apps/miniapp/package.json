@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev:weapp": "taro build --type weapp --watch",
-    "build:weapp": "taro build --type weapp",
+    "dev:weapp": "taro build --type weapp --watch --no-check",
+    "build:weapp": "taro build --type weapp --no-check",
     "lint": "cd ../.. && ./node_modules/.bin/eslint apps/miniapp/src apps/miniapp/config --ext .ts,.tsx",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"

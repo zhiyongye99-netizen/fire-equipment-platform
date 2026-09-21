@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { View, Text, Input, Textarea, Button } from "@tarojs/components";
 import Taro from "@tarojs/taro";
+import { createLead } from "../../services/equipment";
 import "./index.scss";
 
 interface InquiryModalProps {
   isOpen: boolean;
   productId: string;
+  supplierId?: string;
   productName: string;
   onClose: () => void;
   onSuccess?: () => void;
@@ -14,6 +16,7 @@ interface InquiryModalProps {
 export const InquiryModal: React.FC<InquiryModalProps> = ({
   isOpen,
   productId,
+  supplierId,
   productName,
   onClose,
   onSuccess
@@ -35,20 +38,21 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
       Taro.showToast({ title: "请输入有效的手机号码", icon: "none" });
       return;
     }
+    if (!supplierId) {
+      Taro.showToast({ title: "缺少供应商信息，暂无法提交线索", icon: "none" });
+      return;
+    }
 
     setLoading(true);
     try {
-      await Taro.request({
-        url: "http://localhost:3000/api/inquiries",
-        method: "POST",
-        data: {
-          productId,
-          contactName: contactName.trim(),
-          phone: phone.trim(),
-          organization: organization.trim(),
-          remark: remark.trim()
-        }
-      }).catch(() => null);
+      await createLead({
+        supplierId,
+        productId,
+        contactName: contactName.trim(),
+        phone: phone.trim(),
+        organization: organization.trim(),
+        remark: remark.trim()
+      });
 
       Taro.showToast({ title: "询价线索已提交", icon: "success" });
       if (onSuccess) onSuccess();

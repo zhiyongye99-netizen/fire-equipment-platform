@@ -6,6 +6,7 @@ import "./index.scss";
 export interface ProductItem {
   id: string;
   name: string;
+  supplierId?: string;
   categoryName?: string;
   supplierName?: string;
   coverImage?: string;

@@ -5,7 +5,7 @@ const BASE_URL = "http://localhost:3000/api";
 
 async function request<T>(
   path: string,
-  options?: { method?: "GET" | "POST"; data?: Record<string, unknown> }
+  options?: { method?: "GET" | "POST" | "DELETE"; data?: Record<string, unknown> }
 ): Promise<T> {
   const token = getToken();
   const res = await Taro.request({
@@ -26,28 +26,28 @@ async function request<T>(
 export interface ApiProduct {
   id: string;
   name: string;
-  model_no: string;
-  brand: string;
+  model_no?: string | null;
+  brand?: string | null;
   category_id: string;
   cover_image_url: string | null;
-  price_min: string;
-  price_max: string;
-  description: string;
+  price_min: string | number | null;
+  price_max: string | number | null;
+  description?: string | null;
   review_status: string;
   is_featured: boolean;
   view_count: number;
   inquiry_count: number;
   supplier: { id: string; name: string; short_name: string };
-  category: { id: string; name: string; slug: string };
+  category: { id: string; name: string; slug?: string };
 }
 
 export interface ApiProductDetail extends ApiProduct {
   parameters: {
     id: string;
     value: string;
-    template: { field_key: string; field_label: string; unit: string | null };
+    template: { field_key?: string; field_label: string; unit: string | null; sort_order?: number };
   }[];
-  materials: {
+  materials?: {
     id: string;
     file_name: string;
     file_type: string;
@@ -64,7 +64,7 @@ export interface ApiCategory {
 
 export interface ApiListResponse<T> {
   data: T[];
-  meta: { total: number; page: number; limit: number };
+  meta: { total: number; page: number; limit?: number; page_size?: number; total_pages?: number };
 }
 
 export const api = {
@@ -76,31 +76,30 @@ export const api = {
       }),
   },
   products: {
-    list: (params?: { category_id?: string; page?: number; limit?: number }) => {
+    list: (params?: { category_id?: string; page?: number; page_size?: number }) => {
       const qs = new URLSearchParams();
       if (params?.category_id) qs.set("category_id", params.category_id);
       if (params?.page) qs.set("page", String(params.page));
-      if (params?.limit) qs.set("limit", String(params.limit));
+      if (params?.page_size) qs.set("page_size", String(params.page_size));
       const q = qs.toString();
       return request<ApiListResponse<ApiProduct>>(`/products${q ? `?${q}` : ""}`);
     },
     get: (id: string) => request<{ data: ApiProductDetail }>(`/products/${id}`),
     compare: (ids: string[]) =>
-      request<{ data: ApiProductDetail[] }>(`/products/compare?ids=${ids.join(",")}`),
+      request<{ data: ApiProductDetail[] }>(`/products/compare?ids=${encodeURIComponent(ids.join(","))}`),
   },
   categories: {
     list: () => request<ApiListResponse<ApiCategory>>("/categories"),
   },
   leads: {
     create: (body: {
-      product_id: string;
-      contact_name: string;
-      contact_phone: string;
-      organization?: string;
-      remark?: string;
-      lead_type?: string;
+      supplier_id: string;
+      product_id?: string;
+      inquiry_type: "price_inquiry" | "request_material" | "request_demo";
+      region?: string;
+      demand_text?: string;
     }) =>
-      request<{ data: { id: string } }>("/leads", {
+      request<{ data: { id: string }; message?: string }>("/leads", {
         method: "POST",
         data: body as Record<string, unknown>,
       }),

@@ -4,7 +4,7 @@ import Taro from "@tarojs/taro";
 import { ProductCard, ProductItem } from "../../components/ProductCard";
 import { InquiryModal } from "../../components/InquiryModal";
 import { toggleCompareId, subscribeCompare } from "../../utils/compareStore";
-import { api } from "../../utils/api";
+import { fetchProductCards } from "../../services/equipment";
 import "./index.scss";
 
 const TOP_TABS = ["车辆", "灭火", "水域", "无人装备"];
@@ -47,14 +47,14 @@ export default function EquipmentPage() {
     setIsLoadingProducts(true);
     setProductLoadError("");
 
-    api.products.list({ limit: 20 })
-      .then((res) => {
+    fetchProductCards()
+      .then((items) => {
         if (!isMounted) {
           return;
         }
 
-        if (res && Array.isArray(res.data)) {
-          setProducts(res.data as unknown as ProductItem[]);
+        if (Array.isArray(items)) {
+          setProducts(items);
           return;
         }
 
@@ -228,6 +228,7 @@ export default function EquipmentPage() {
       <InquiryModal
         isOpen={!!inquiryTarget}
         productId={inquiryTarget?.id || ""}
+        supplierId={inquiryTarget?.supplierId || ""}
         productName={inquiryTarget?.name || ""}
         onClose={() => setInquiryTarget(null)}
       />
