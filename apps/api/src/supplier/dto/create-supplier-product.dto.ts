@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsNumber, IsPositive } from "class-validator";
+import { IsString, IsOptional, IsNumber, IsPositive, IsBoolean } from "class-validator";
 
 export class CreateSupplierProductDto {
   @IsString()
@@ -28,4 +28,8 @@ export class CreateSupplierProductDto {
   @IsNumber()
   @IsPositive()
   price_max?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  submit_for_review?: boolean;
 }

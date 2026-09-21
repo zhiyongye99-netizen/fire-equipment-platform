@@ -5,7 +5,7 @@
 
 // ─── Products ────────────────────────────────────────────────────────────────
 
-export type ProductStatus = "草稿" | "审核中" | "已上架" ;
+export type ProductStatus = "草稿" | "审核中" | "已上架" | "已驳回" | "已下架";
 
 export interface Product {
   id: string;
@@ -21,8 +21,9 @@ export interface Product {
 
 export interface CreateProductPayload {
   name: string;
-  model?: string;
-  category: string;
+  modelNo?: string;
+  brand?: string;
+  categoryId: string;
   minPrice?: number;
   maxPrice?: number;
   description?: string;

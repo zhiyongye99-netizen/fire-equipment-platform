@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { View, Text, Input, Textarea, Button } from "@tarojs/components";
 import Taro from "@tarojs/taro";
+import { api } from "../../utils/api";
+import { getToken, wechatLogin } from "../../utils/auth";
 import "./index.scss";
 
 interface InquiryModalProps {
   isOpen: boolean;
   productId: string;
+  supplierId?: string;
   productName: string;
   onClose: () => void;
   onSuccess?: () => void;
@@ -14,12 +17,13 @@ interface InquiryModalProps {
 export const InquiryModal: React.FC<InquiryModalProps> = ({
   isOpen,
   productId,
+  supplierId,
   productName,
   onClose,
   onSuccess
 }) => {
   const [contactName, setContactName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [region, setRegion] = useState("");
   const [organization, setOrganization] = useState("");
   const [remark, setRemark] = useState("");
   const [loading, setLoading] = useState(false);
@@ -31,24 +35,34 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
       Taro.showToast({ title: "请输入联系人姓名", icon: "none" });
       return;
     }
-    if (!phone.trim() || !/^1\d{10}$/.test(phone.trim())) {
-      Taro.showToast({ title: "请输入有效的手机号码", icon: "none" });
+    if (!supplierId) {
+      Taro.showToast({ title: "供应商信息缺失，暂不能提交", icon: "none" });
       return;
     }
 
     setLoading(true);
     try {
-      await Taro.request({
-        url: "http://localhost:3000/api/inquiries",
-        method: "POST",
-        data: {
-          productId,
-          contactName: contactName.trim(),
-          phone: phone.trim(),
-          organization: organization.trim(),
-          remark: remark.trim()
+      if (!getToken()) {
+        const user = await wechatLogin();
+        if (!user) {
+          Taro.showToast({ title: "请先完成微信登录后再提交", icon: "none" });
+          return;
         }
-      }).catch(() => null);
+      }
+
+      const demandText = [
+        `联系人：${contactName.trim()}`,
+        organization.trim() ? `单位：${organization.trim()}` : "",
+        remark.trim() ? `需求：${remark.trim()}` : "",
+      ].filter(Boolean).join("\n");
+
+      await api.leads.create({
+        supplier_id: supplierId,
+        product_id: productId || undefined,
+        inquiry_type: "price_inquiry",
+        region: region.trim() || undefined,
+        demand_text: demandText || undefined,
+      });
 
       Taro.showToast({ title: "询价线索已提交", icon: "success" });
       if (onSuccess) onSuccess();
@@ -84,14 +98,12 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
         </View>
 
         <View className="form-group">
-          <Text className="field-label"><Text className="required">*</Text>联系电话</Text>
+          <Text className="field-label">所在地区</Text>
           <Input
             className="field-input"
-            type="number"
-            maxlength={11}
-            placeholder="请输入11位手机号码"
-            value={phone}
-            onInput={e => setPhone(e.detail.value)}
+            placeholder="如：江苏徐州 / 广东广州"
+            value={region}
+            onInput={e => setRegion(e.detail.value)}
           />
         </View>
 

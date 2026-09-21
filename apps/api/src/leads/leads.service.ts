@@ -10,6 +10,17 @@ export class LeadsService {
     const supplier = await this.prisma.supplier.findUnique({ where: { id: dto.supplier_id } });
     if (!supplier) throw new BadRequestException("供应商不存在");
 
+    if (dto.product_id) {
+      const product = await this.prisma.product.findUnique({
+        where: { id: dto.product_id },
+        select: { supplier_id: true },
+      });
+      if (!product) throw new BadRequestException("产品不存在");
+      if (product.supplier_id !== dto.supplier_id) {
+        throw new BadRequestException("产品与供应商不匹配");
+      }
+    }
+
     const inquiry = await this.prisma.inquiry.create({
       data: {
         user_id: userId,
@@ -21,10 +32,12 @@ export class LeadsService {
       },
     });
 
-    await this.prisma.product.updateMany({
-      where: { id: dto.product_id ?? "" },
-      data: { inquiry_count: { increment: 1 } },
-    });
+    if (dto.product_id) {
+      await this.prisma.product.update({
+        where: { id: dto.product_id },
+        data: { inquiry_count: { increment: 1 } },
+      });
+    }
 
     return { data: inquiry, message: "线索发送成功" };
   }

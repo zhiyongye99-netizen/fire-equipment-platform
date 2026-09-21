@@ -9,15 +9,23 @@
 ## 装备与产品
 
 - GET /api/equipment/categories
-- GET /api/products
+- GET /api/products?page=1&page_size=20
 - GET /api/products/:id
 - POST /api/products/compare
 - POST /api/favorites
 - DELETE /api/favorites/:id
 
+产品列表分页返回：
+
+- data：产品列表。
+- meta.total：总条数。
+- meta.page：当前页码。
+- meta.page_size：每页条数。
+- meta.total_pages：总页数。
+
 ## 询价线索
 
-- POST /api/inquiries
+- POST /api/leads
 - GET /api/me/inquiries
 - GET /api/supplier/leads
 - GET /api/supplier/leads/:id

@@ -1,15 +1,19 @@
-import { Controller, Post, Body } from "@nestjs/common";
+import { Controller, Post, Body, Req, UseGuards } from "@nestjs/common";
 import { LeadsService } from "./leads.service";
 import { CreateLeadDto } from "./dto/create-lead.dto";
+import { AuthGuard } from "../common/guards/auth.guard";
+
+interface AuthRequest {
+  user: { sub: string; [key: string]: unknown };
+}
 
 @Controller("leads")
+@UseGuards(AuthGuard)
 export class LeadsController {
   constructor(private readonly leadsService: LeadsService) {}
 
-  // TODO: 加 AuthGuard 后从 request 取真实 user_id
   @Post()
-  create(@Body() dto: CreateLeadDto) {
-    const mockUserId = "guest";
-    return this.leadsService.create(dto, mockUserId);
+  create(@Body() dto: CreateLeadDto, @Req() req: AuthRequest) {
+    return this.leadsService.create(dto, req.user.sub);
   }
 }

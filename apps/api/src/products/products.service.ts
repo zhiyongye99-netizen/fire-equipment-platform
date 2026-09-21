@@ -7,8 +7,10 @@ export class ProductsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(query: QueryProductsDto) {
-    const { category_id, keyword, price_min, price_max, page = 1, page_size = 20 } = query;
-    const skip = (page - 1) * page_size;
+    const { category_id, keyword, price_min, price_max } = query;
+    const page = query.page ?? 1;
+    const pageSize = query.page_size ?? query.limit ?? 20;
+    const skip = (page - 1) * pageSize;
 
     const where: Record<string, unknown> = { review_status: "approved" };
     if (category_id) where.category_id = category_id;
@@ -20,14 +22,14 @@ export class ProductsService {
       this.prisma.product.findMany({
         where,
         skip,
-        take: page_size,
+        take: pageSize,
         orderBy: [{ is_featured: "desc" }, { created_at: "desc" }],
         include: { supplier: { select: { id: true, name: true, short_name: true } }, category: { select: { id: true, name: true, slug: true } } },
       }),
       this.prisma.product.count({ where }),
     ]);
 
-    return { data: items, meta: { total, page, page_size, total_pages: Math.ceil(total / page_size) } };
+    return { data: items, meta: { total, page, page_size: pageSize, total_pages: Math.ceil(total / pageSize) } };
   }
 
   async findOne(id: string) {
